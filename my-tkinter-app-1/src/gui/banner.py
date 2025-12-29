@@ -54,15 +54,23 @@ class Banner:
         screen_width = self.master.winfo_screenwidth()
         x = int((screen_width - w) / 2)
         y = 0
-        magenta_hex = '#FF00FF'
-        popup = Toplevel(self.master)
-        popup.overrideredirect(1)
-        popup.geometry(f"{w}x{h}+{x}+{y}")
-        popup.configure(bg=magenta_hex)
-        try:
-            popup.attributes('-transparentcolor', magenta_hex)
-        except Exception:
-            pass
+        import platform
+        system = platform.system()
+        if system == "Windows":
+            magenta_hex = '#FF00FF'
+            popup = Toplevel(self.master)
+            popup.overrideredirect(1)
+            popup.geometry(f"{w}x{h}+{x}+{y}")
+            popup.configure(bg=magenta_hex)
+            try:
+                popup.attributes('-transparentcolor', magenta_hex)
+            except Exception:
+                pass
+        else:
+            popup = Toplevel(self.master)
+            popup.overrideredirect(1)
+            popup.geometry(f"{w}x{h}+{x}+{y}")
+            popup.configure(bg='')
         popup.attributes('-topmost', True)
         start_x = (w - total_btn_w) // 2
         btn_y = 5
@@ -76,13 +84,24 @@ class Banner:
             try:
                 img = Image.open(photo)
                 print(f"Banner: Image loaded for idx={idx}")
-                img = self.make_rounded_transparent(img, btn_size)
-                print(f"Banner: Image processed for idx={idx}")
-                img_tk = ImageTk.PhotoImage(img)
-                print(f"Banner: ImageTk created for idx={idx}")
-                self._link_images.append(img_tk)
-                from tkinter import Label
-                lbl = Label(popup, image=img_tk, bg=magenta_hex, borderwidth=0, highlightthickness=0)
+                if system == "Windows":
+                    img = self.make_rounded_transparent(img, btn_size)
+                    img_tk = ImageTk.PhotoImage(img)
+                    self._link_images.append(img_tk)
+                    from tkinter import Label
+                    lbl = Label(popup, image=img_tk, bg=magenta_hex, borderwidth=0, highlightthickness=0)
+                else:
+                    # Sur Linux/Mac, on garde la transparence alpha
+                    img = img.convert('RGBA').resize((btn_size, btn_size))
+                    # Bords arrondis
+                    mask = Image.new('L', (btn_size, btn_size), 0)
+                    draw = ImageDraw.Draw(mask)
+                    draw.ellipse((0, 0, btn_size, btn_size), fill=255)
+                    img.putalpha(mask)
+                    img_tk = ImageTk.PhotoImage(img)
+                    self._link_images.append(img_tk)
+                    from tkinter import Label
+                    lbl = Label(popup, image=img_tk, bg='', borderwidth=0, highlightthickness=0)
                 lbl.place(x=start_x + idx * (btn_size + btn_pad), y=btn_y, width=btn_size, height=btn_size)
                 lbl.bind('<Button-1>', lambda e, u=url: webbrowser.open(u))
                 print(f"Banner: Image placed on label idx={idx}")
