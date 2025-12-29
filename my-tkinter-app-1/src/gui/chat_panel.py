@@ -22,9 +22,10 @@ def get_monospace_font():
         return "Liberation Mono"
 
 class ChatPanel:
-    def __init__(self, master, on_send_callback):
+    def __init__(self, master, on_send_callback, open_settings_callback=None):
         self.master = master
         self.on_send_callback = on_send_callback
+        self.open_settings_callback = open_settings_callback
         self.frame = None
         self.chat_text = None
         self.user_entry = None
@@ -42,8 +43,14 @@ class ChatPanel:
         self.frame.place(x=margin_left, y=margin_top, relwidth=1, relheight=1, height=-(margin_top+margin_bottom), width=-(margin_left+margin_right))
         self.frame.grid_rowconfigure(1, weight=1)
         self.frame.grid_columnconfigure(0, weight=1)
+        # Label du chat
         self.chat_label = Label(self.master, text="Proposition d'organisation :", font=(get_system_font(), 12, "bold"), fg="#fff", bg="#23272f")
         self.chat_label.pack(padx=18, anchor="w")
+        # Bouton Paramètres en haut à droite
+        from tkinter import Button
+        self.settings_button = Button(self.master, text="⚙️", font=(get_system_font(), 14), bg="#444", fg="#FFD700", relief="flat", command=self._open_settings)
+        self.settings_button.place(relx=1.0, x=-40, y=10, anchor="ne")
+        # Progress bar
         self.progress = Progressbar(self.frame, orient="horizontal", mode="determinate", length=200)
         self.progress.grid(row=0, column=0, sticky="ew", pady=(0, 10))
         self.progress['value'] = 0
@@ -71,3 +78,7 @@ class ChatPanel:
         self.chat_text.config(state="disabled")
         self.user_entry.delete(0, END)
         self.on_send_callback(user_text)
+
+    def _open_settings(self):
+        if self.open_settings_callback:
+            self.open_settings_callback()

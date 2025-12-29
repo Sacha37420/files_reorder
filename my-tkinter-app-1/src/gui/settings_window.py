@@ -119,9 +119,25 @@ class SettingsWindow:
         def validate():
             url = url_entry.get().strip()
             photo = photo_entry.get().strip()
-            if url and photo:
+            if url:
+                if not photo:
+                    try:
+                        from banner import fetch_favicon_base64
+                        photo = fetch_favicon_base64(url) or ''
+                    except Exception as e:
+                        print(f"Erreur récupération favicon : {e}")
                 self.links_listbox.insert(END, f"{url} | {photo}")
                 popup.destroy()
+                # Rafraîchit le bandeau si la méthode existe sur le parent
+                parent = self.settings_window.master
+                while parent:
+                    if hasattr(parent, 'show_links_photos_buttons'):
+                        parent.show_links_photos_buttons()
+                        break
+                    if hasattr(parent, 'master'):
+                        parent = parent.master
+                    else:
+                        break
         Button(popup, text="Ajouter", font=(get_system_font(), 10, "bold"), bg="#FFD700", fg="#23272f", relief="flat", command=validate).pack(pady=(0, 10))
 
     def remove_link_photo(self):

@@ -39,7 +39,7 @@ class FileOrganizerApp:
         master.configure(bg="#23272f")
 
         self.settings = self.load_settings()
-        self.chat_panel = ChatPanel(master, self.on_send)
+        self.chat_panel = ChatPanel(master, self.on_send, open_settings_callback=self.open_settings)
         self.chat_panel.build()
 
         # Load settings
@@ -123,18 +123,18 @@ class FileOrganizerApp:
             self.modify_organization(user_text)
 
     def apply_organization(self):
-        """Applique l'organisation actuelle aux fichiers."""
+        """Applique l'organisation actuelle aux fichiers et la sauvegarde dans les settings."""
         if not hasattr(self, 'last_regrouped'):
             return
-        
+        self.settings['organization'] = self.last_regrouped
+        self.save_settings()
         self.chat_panel.chat_text.config(state="normal")
         self.chat_panel.chat_text.insert(END, "\nAssistant : Organisation en cours...\n", ("system",))
         self.chat_panel.chat_text.tag_config("system", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
         self.chat_panel.chat_text.config(state="disabled")
-        
         # Ici on appellerait la fonction d'organisation réelle
         # organize_files(self.last_regrouped, self.last_files)
-        
+
     def modify_organization(self, user_text):
         """Modifie l'organisation selon la demande de l'utilisateur."""
         if not hasattr(self, 'last_regrouped'):
@@ -244,13 +244,22 @@ class FileOrganizerApp:
             "Pour chaque fichier, indique le thème et le sous-thème (ou une chaîne vide si non pertinent).\n"
             "ATTENTION :\n"
             "- Réponds STRICTEMENT au format JSON ci-dessous, sans aucun texte avant ou après, sans tableau d'objets, sans clé supplémentaire.\n"
-            "- Utilise uniquement des guillemets doubles (\"\") pour le JSON.\n"
+            "- Utilise uniquement des guillemets doubles (\"") pour le JSON.\n"
             "- Ne modifie que les thèmes/sous-thèmes des fichiers concernés, laisse les autres inchangés.\n"
             "- N'invente pas de nouveaux fichiers.\n"
             "Exemple de réponse attendue :\n"
             "\"{\\\"fichier1.txt\\\": {\\\"theme\\\": \\\"ThèmeA\\\", \\\"sous_theme\\\": \\\"SousA\\\"}, \\\"fichier2.txt\\\": {\\\"theme\\\": \\\"ThèmeB\\\", \\\"sous_theme\\\": \\\"\\\"}}\"\n"
             "Voici l'organisation actuelle :\n"
         )
+        # Ajoute les thèmes/sous-thèmes déjà enregistrés
+        existing_org = self.settings.get('organization')
+        if existing_org:
+            prompt += "\nThèmes et sous-thèmes déjà existants :\n"
+            for theme, sous_dict in existing_org.items():
+                prompt += f"- Thème : {theme}\n"
+                for sous_theme in sous_dict:
+                    if sous_theme:
+                        prompt += f"    Sous-thème : {sous_theme}\n"
         for theme, sous_dict in regrouped.items():
             prompt += f"Thème : {theme}\n"
             for sous_theme, files_list in sous_dict.items():
