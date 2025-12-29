@@ -10,9 +10,7 @@ from ai.gemini_validator import GeminiValidator
 
 import platform
 
-# ...existing code...
-
-
+        self.chat_text.pack(side="left", fill="both", expand=True)
     root = Tk()
 
     # Get screen dimensions
@@ -52,6 +50,7 @@ import platform
 
 if __name__ == "__main__":
     main()
+
         self.scrollbar = Scrollbar(chat_frame, command=self.chat_text.yview, bg="#23272f", troughcolor="#23272f", bd=0, relief="flat")
         self.scrollbar.pack(side='right', fill='y')
         self.chat_text.config(yscrollcommand=self.scrollbar.set)
