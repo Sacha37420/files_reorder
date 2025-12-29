@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Entry, Button, Text, Scrollbar, END, Frame, Listbox, Toplevel, filedialog
+from tkinter import Tk, END, Frame, filedialog
 from tkinter.ttk import Progressbar
 import json
 import os
@@ -8,6 +8,9 @@ import platform
 sys.path.append(str(pathlib.Path(__file__).resolve().parent.parent))
 from organizer.file_organizer import organize_files
 from ai.gemini_validator import GeminiValidator
+from banner import Banner
+from settings_window import SettingsWindow
+from chat_panel import ChatPanel
 
 def get_system_font():
     """Get appropriate font family for the current system."""
@@ -35,61 +38,17 @@ class FileOrganizerApp:
         master.title("File Organizer")
         master.configure(bg="#23272f")
 
-
-
-
-        # Chat display area (proposition d'organisation)
-        self.chat_label = Label(master, text="Proposition d'organisation :", font=(get_system_font(), 12, "bold"), fg="#fff", bg="#23272f")
-        self.chat_label.pack(padx=18, anchor="w")
-
-
-
-        # Main container to manage chat and input area
-        # Add top, right, and bottom margins
-        margin_top = 40
-        margin_bottom = 24
-        margin_right = 32
-        margin_left = 32
-        main_container = Frame(master, bg="#23272f")
-        main_container.place(x=margin_left, y=margin_top, relwidth=1, relheight=1, height=-(margin_top+margin_bottom), width=-(margin_left+margin_right))
-
-        # Layout: vertical (progress bar, chat, input)
-        main_container.grid_rowconfigure(1, weight=1)
-        main_container.grid_columnconfigure(0, weight=1)
-
-        # Progress bar above chat
-        self.progress = Progressbar(main_container, orient="horizontal", mode="determinate", length=200)
-        self.progress.grid(row=0, column=0, sticky="ew", pady=(0, 10))
-        self.progress['value'] = 0
-
-        chat_frame = Frame(main_container, bg="#23272f")
-        chat_frame.grid(row=1, column=0, sticky="nsew")
-
-        self.chat_text = Text(chat_frame, font=(get_monospace_font(), 11), bg="#181a20", fg="#e0e0e0", relief="flat", wrap="word", state="disabled", borderwidth=0, highlightthickness=1, highlightbackground="#444")
-        self.chat_text.pack(side="left", fill="both", expand=True)
-
-        self.scrollbar = Scrollbar(chat_frame, command=self.chat_text.yview, bg="#23272f", troughcolor="#23272f", bd=0, relief="flat")
-        self.scrollbar.pack(side='right', fill='y')
-        self.chat_text.config(yscrollcommand=self.scrollbar.set)
-
-        # Input area (Entry + Buttons) just below chat, always visible
-        input_frame = Frame(main_container, bg="#23272f")
-        input_frame.grid(row=2, column=0, sticky="ew", pady=(8, 0))
-        self.user_entry = Entry(input_frame, font=(get_system_font(), 11), bg="#23272f", fg="#fff", insertbackground="#fff", relief="flat", width=32)
-        self.user_entry.pack(side="left", fill="x", expand=True, padx=(0, 8))
-        
-        # Settings button
-        self.settings_button = Button(input_frame, text="⚙️", font=(get_system_font(), 10, "bold"), bg="#6c757d", fg="#fff", relief="flat", command=self.open_settings, width=3)
-        self.settings_button.pack(side="right", padx=(0, 4))
-        
-        self.send_button = Button(input_frame, text="Envoyer", font=(get_system_font(), 10, "bold"), bg="#FFD700", fg="#23272f", relief="flat", command=self.on_send)
-        self.send_button.pack(side="right")
+        self.settings = self.load_settings()
+        self.chat_panel = ChatPanel(master, self.on_send)
+        self.chat_panel.build()
 
         # Load settings
         self.settings = self.load_settings()
         
         # Show initial loading and reorganization message
         self.show_initial_message()
+        print(f"App: settings['links_photos'] = {self.settings.get('links_photos', [])}")
+        self.show_links_photos_buttons()
     
     def load_settings(self):
         """Load settings from configuration file."""
@@ -116,72 +75,11 @@ class FileOrganizerApp:
             print(f"Error saving settings: {e}")
     
     def open_settings(self):
-        """Open the settings configuration window."""
-        self.settings_window = Toplevel(self.master)
-        self.settings_window.title("Paramètres")
-        self.settings_window.configure(bg="#23272f")
-        self.settings_window.geometry("500x400")
-        self.settings_window.resizable(False, False)
-        
-        # Center the settings window
-        self.settings_window.transient(self.master)
-        self.settings_window.grab_set()
-        
-        # Position relative to parent window
-        x = self.master.winfo_x() - 520  # Place to the left of main window
-        y = self.master.winfo_y()
-        self.settings_window.geometry(f"500x400+{x}+{y}")
-        
-        # NAS URL section
-        nas_label = Label(self.settings_window, text="URL du NAS:", font=(get_system_font(), 12, "bold"), fg="#fff", bg="#23272f")
-        nas_label.pack(pady=(20, 5), anchor="w", padx=20)
-        
-        self.nas_entry = Entry(self.settings_window, font=(get_system_font(), 11), bg="#181a20", fg="#e0e0e0", insertbackground="#fff", relief="flat", width=60)
-        self.nas_entry.pack(pady=(0, 15), padx=20, fill="x")
-        self.nas_entry.insert(0, self.settings.get('nas_url', ''))
-        
-        # Scan folders section
-        folders_label = Label(self.settings_window, text="Dossiers à scanner:", font=(get_system_font(), 12, "bold"), fg="#fff", bg="#23272f")
-        folders_label.pack(pady=(0, 5), anchor="w", padx=20)
-        
-        # Frame for folders list and buttons
-        folders_frame = Frame(self.settings_window, bg="#23272f")
-        folders_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
-        
-        # Listbox for folders
-        self.folders_listbox = Listbox(folders_frame, font=(get_monospace_font(), 10), bg="#181a20", fg="#e0e0e0", selectbackground="#FFD700", selectforeground="#23272f", relief="flat", height=8)
-        self.folders_listbox.pack(side="left", fill="both", expand=True)
-        
-        # Scrollbar for listbox
-        folders_scrollbar = Scrollbar(folders_frame, command=self.folders_listbox.yview, bg="#23272f", troughcolor="#23272f")
-        folders_scrollbar.pack(side="right", fill="y")
-        self.folders_listbox.config(yscrollcommand=folders_scrollbar.set)
-        
-        # Populate listbox with current folders
-        for folder in self.settings.get('scan_folders', []):
-            self.folders_listbox.insert(END, folder)
-        
-        # Buttons frame
-        buttons_frame = Frame(self.settings_window, bg="#23272f")
-        buttons_frame.pack(fill="x", padx=20, pady=(0, 20))
-        
-        # Add folder button
-        add_button = Button(buttons_frame, text="Ajouter dossier", font=(get_system_font(), 10), bg="#28a745", fg="#fff", relief="flat", command=self.add_folder)
-        add_button.pack(side="left", padx=(0, 10))
-        
-        # Remove folder button
-        remove_button = Button(buttons_frame, text="Supprimer", font=(get_system_font(), 10), bg="#dc3545", fg="#fff", relief="flat", command=self.remove_folder)
-        remove_button.pack(side="left", padx=(0, 10))
-        
-        # Save and Cancel buttons
-        action_frame = Frame(self.settings_window, bg="#23272f")
-        action_frame.pack(fill="x", padx=20, pady=(0, 20))
-        
-        cancel_button = Button(action_frame, text="Annuler", font=(get_system_font(), 10), bg="#6c757d", fg="#fff", relief="flat", command=self.settings_window.destroy)
-        cancel_button.pack(side="right", padx=(10, 0))
-        
-        save_button = Button(action_frame, text="Sauvegarder", font=(get_system_font(), 10, "bold"), bg="#FFD700", fg="#23272f", relief="flat", command=self.save_settings_and_close)
-        save_button.pack(side="right")
+        def save_callback(new_settings):
+            self.settings = new_settings
+            self.save_settings()
+        win = SettingsWindow(self.master, self.settings, save_callback)
+        win.show()
     
     def add_folder(self):
         """Add a folder to the scan list."""
@@ -206,15 +104,16 @@ class FileOrganizerApp:
         self.save_settings()
         self.settings_window.destroy()
 
-    def on_send(self):
-        user_text = self.user_entry.get().strip()
+    def on_send(self, user_text=None):
+        if user_text is None:
+            user_text = self.chat_panel.user_entry.get().strip()
         if not user_text:
             return
-        self.chat_text.config(state="normal")
-        self.chat_text.insert(END, f"\nVous : {user_text}\n", ("user",))
-        self.chat_text.tag_config("user", foreground="#7CFC00", font=(get_system_font(), 10, "bold"))
-        self.chat_text.config(state="disabled")
-        self.user_entry.delete(0, END)
+        self.chat_panel.chat_text.config(state="normal")
+        self.chat_panel.chat_text.insert(END, f"\nVous : {user_text}\n", ("user",))
+        self.chat_panel.chat_text.tag_config("user", foreground="#7CFC00", font=(get_system_font(), 10, "bold"))
+        self.chat_panel.chat_text.config(state="disabled")
+        self.chat_panel.user_entry.delete(0, END)
 
         # Si l'utilisateur confirme (ex: "oui", "ok", "valider", etc.)
         if user_text.lower() in ["oui", "ok", "valider", "c'est bon", "confirmer", "accepter"]:
@@ -228,10 +127,10 @@ class FileOrganizerApp:
         if not hasattr(self, 'last_regrouped'):
             return
         
-        self.chat_text.config(state="normal")
-        self.chat_text.insert(END, "\nAssistant : Organisation en cours...\n", ("system",))
-        self.chat_text.tag_config("system", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
-        self.chat_text.config(state="disabled")
+        self.chat_panel.chat_text.config(state="normal")
+        self.chat_panel.chat_text.insert(END, "\nAssistant : Organisation en cours...\n", ("system",))
+        self.chat_panel.chat_text.tag_config("system", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
+        self.chat_panel.chat_text.config(state="disabled")
         
         # Ici on appellerait la fonction d'organisation réelle
         # organize_files(self.last_regrouped, self.last_files)
@@ -246,10 +145,10 @@ class FileOrganizerApp:
         from organizer.file_organizer import get_ai_response
         
         def worker():
-            self.chat_text.config(state="normal")
-            self.chat_text.insert(END, "\nAssistant : Modification en cours...\n", ("system",))
-            self.chat_text.tag_config("system", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
-            self.chat_text.config(state="disabled")
+            self.chat_panel.chat_text.config(state="normal")
+            self.chat_panel.chat_text.insert(END, "\nAssistant : Modification en cours...\n", ("system",))
+            self.chat_panel.chat_text.tag_config("system", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
+            self.chat_panel.chat_text.config(state="disabled")
             
             # Traiter par batch pour éviter les limites de token
             batch_size = 10
@@ -315,29 +214,28 @@ class FileOrganizerApp:
                 regrouped[theme][sous_theme].append(file_name)
             print("[DEBUG] Organisation regroupée :\n", regrouped)
             self.last_regrouped = regrouped
-            self.progress['value'] = 80
-            self.chat_text.config(state="normal")
-            self.chat_text.delete(1.0, END)
-            self.chat_text.insert(END, "\n===== NOUVELLE ORGANISATION PROPOSÉE =====\n\n")
+            self.chat_panel.chat_text.config(state="normal")
+            self.chat_panel.chat_text.delete(1.0, END)
+            self.chat_panel.chat_text.insert(END, "\n===== NOUVELLE ORGANISATION PROPOSÉE =====\n\n")
             for theme, sous_dict in regrouped.items():
-                self.chat_text.insert(END, f"Thème : {theme}\n", ("theme",))
+                self.chat_panel.chat_text.insert(END, f"Thème : {theme}\n", ("theme",))
                 for sous_theme, files_list in sous_dict.items():
                     if sous_theme and sous_theme != "":
-                        self.chat_text.insert(END, f"  Sous-thème : {sous_theme}\n", ("sous_theme",))
+                        self.chat_panel.chat_text.insert(END, f"  Sous-thème : {sous_theme}\n", ("sous_theme",))
                         for file_name in files_list:
-                            self.chat_text.insert(END, f"    • {file_name}\n", ("file",))
+                            self.chat_panel.chat_text.insert(END, f"    • {file_name}\n", ("file",))
                     else:
                         for file_name in files_list:
-                            self.chat_text.insert(END, f"  • {file_name}\n", ("file",))
-                self.chat_text.insert(END, "\n")
-            self.chat_text.insert(END, "===================================\n")
-            self.chat_text.insert(END, "\nMerci de confirmer cette organisation ou de préciser une demande de modification (ex : déplacer un fichier, renommer un thème, etc.).\n", ("confirm",))
-            self.chat_text.tag_config("theme", foreground="#FFD700", font=(get_system_font(), 11, "bold"))
-            self.chat_text.tag_config("sous_theme", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
-            self.chat_text.tag_config("file", foreground="#e0e0e0", font=(get_monospace_font(), 10))
-            self.chat_text.tag_config("confirm", foreground="#FFD700", font=(get_system_font(), 11, "italic"))
-            self.chat_text.config(state="disabled")
-            self.progress['value'] = 100
+                            self.chat_panel.chat_text.insert(END, f"  • {file_name}\n", ("file",))
+                self.chat_panel.chat_text.insert(END, "\n")
+            self.chat_panel.chat_text.insert(END, "===================================\n")
+            self.chat_panel.chat_text.insert(END, "\nMerci de confirmer cette organisation ou de préciser une demande de modification (ex : déplacer un fichier, renommer un thème, etc.).\n", ("confirm",))
+            self.chat_panel.chat_text.tag_config("theme", foreground="#FFD700", font=(get_system_font(), 11, "bold"))
+            self.chat_panel.chat_text.tag_config("sous_theme", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
+            self.chat_panel.chat_text.tag_config("file", foreground="#e0e0e0", font=(get_monospace_font(), 10))
+            self.chat_panel.chat_text.tag_config("confirm", foreground="#FFD700", font=(get_system_font(), 11, "italic"))
+            self.chat_panel.chat_text.config(state="disabled")
+            self.chat_panel.progress['value'] = 100
         threading.Thread(target=worker, daemon=True).start()
 
     def build_modification_prompt(self, user_text, regrouped):
@@ -368,20 +266,20 @@ class FileOrganizerApp:
     def show_initial_message(self):
         import threading, time, json
         from organizer.file_organizer import get_default_user_dirs, get_all_files
-        self.chat_text.config(state="normal")
-        self.chat_text.delete(1.0, END)
-        self.chat_text.insert(END, "Assistant : Analyse de la réorganisation en cours")
-        self.chat_text.config(state="disabled")
+        self.chat_panel.chat_text.config(state="normal")
+        self.chat_panel.chat_text.delete(1.0, END)
+        self.chat_panel.chat_text.insert(END, "Assistant : Analyse de la réorganisation en cours")
+        self.chat_panel.chat_text.config(state="disabled")
 
         def loading_and_real_organization():
             for i in range(3):
-                self.chat_text.config(state="normal")
-                self.chat_text.insert(END, ".")
-                self.chat_text.see(END)
-                self.chat_text.config(state="disabled")
+                self.chat_panel.chat_text.config(state="normal")
+                self.chat_panel.chat_text.insert(END, ".")
+                self.chat_panel.chat_text.see(END)
+                self.chat_panel.chat_text.config(state="disabled")
                 time.sleep(0.5)
             # Get real organization suggestion
-            self.progress['value'] = 30
+            self.chat_panel.progress['value'] = 30
             
             # Use configured folders or default ones if none configured
             dirs = self.settings.get('scan_folders', [])
@@ -398,9 +296,9 @@ class FileOrganizerApp:
                     files.extend(get_all_files(d))
                 else:
                     print(f"Warning: Directory {d} does not exist")
-            self.progress['value'] = 60
+            self.chat_panel.progress['value'] = 60
             suggestions = self.gemini_validator.suggest_schema(files, batch_size=5)
-            self.progress['value'] = 90
+            self.chat_panel.progress['value'] = 90
             # Regrouper les suggestions par thème et sous-thème
             regrouped = {}
             for file_name, info in suggestions.items():
@@ -412,29 +310,29 @@ class FileOrganizerApp:
                     regrouped[theme][sous_theme] = []
                 regrouped[theme][sous_theme].append(file_name)
 
-            self.chat_text.config(state="normal")
-            self.chat_text.insert(END, "\n===== RÉORGANISATION PROPOSÉE =====\n\n")
+            self.chat_panel.chat_text.config(state="normal")
+            self.chat_panel.chat_text.insert(END, "\n===== RÉORGANISATION PROPOSÉE =====\n\n")
             for theme, sous_dict in regrouped.items():
-                self.chat_text.insert(END, f"Thème : {theme}\n", ("theme",))
+                self.chat_panel.chat_text.insert(END, f"Thème : {theme}\n", ("theme",))
                 for sous_theme, files_list in sous_dict.items():
                     if sous_theme and sous_theme != "":
-                        self.chat_text.insert(END, f"  Sous-thème : {sous_theme}\n", ("sous_theme",))
+                        self.chat_panel.chat_text.insert(END, f"  Sous-thème : {sous_theme}\n", ("sous_theme",))
                         for file_name in files_list:
-                            self.chat_text.insert(END, f"    • {file_name}\n", ("file",))
+                            self.chat_panel.chat_text.insert(END, f"    • {file_name}\n", ("file",))
                     else:
                         for file_name in files_list:
-                            self.chat_text.insert(END, f"  • {file_name}\n", ("file",))
-                self.chat_text.insert(END, "\n")
-            self.chat_text.insert(END, "===================================\n")
+                            self.chat_panel.chat_text.insert(END, f"  • {file_name}\n", ("file",))
+                self.chat_panel.chat_text.insert(END, "\n")
+            self.chat_panel.chat_text.insert(END, "===================================\n")
             # Styles pour améliorer la lisibilité
-            self.chat_text.tag_config("theme", foreground="#FFD700", font=(get_system_font(), 11, "bold"))
-            self.chat_text.tag_config("sous_theme", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
-            self.chat_text.tag_config("file", foreground="#e0e0e0", font=(get_monospace_font(), 10))
+            self.chat_panel.chat_text.tag_config("theme", foreground="#FFD700", font=(get_system_font(), 11, "bold"))
+            self.chat_panel.chat_text.tag_config("sous_theme", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
+            self.chat_panel.chat_text.tag_config("file", foreground="#e0e0e0", font=(get_monospace_font(), 10))
             # Message de confirmation/modification
-            self.chat_text.insert(END, "\nMerci de confirmer cette organisation ou de préciser une demande de modification (ex : déplacer un fichier, renommer un thème, etc.).\n", ("confirm",))
-            self.chat_text.tag_config("confirm", foreground="#FFD700", font=(get_system_font(), 11, "italic"))
-            self.chat_text.config(state="disabled")
-            self.progress['value'] = 100
+            self.chat_panel.chat_text.insert(END, "\nMerci de confirmer cette organisation ou de préciser une demande de modification (ex : déplacer un fichier, renommer un thème, etc.).\n", ("confirm",))
+            self.chat_panel.chat_text.tag_config("confirm", foreground="#FFD700", font=(get_system_font(), 11, "italic"))
+            self.chat_panel.chat_text.config(state="disabled")
+            self.chat_panel.progress['value'] = 100
             # Stocke la dernière organisation pour modification/validation
             self.last_regrouped = regrouped
             self.last_files = files
@@ -445,6 +343,10 @@ class FileOrganizerApp:
 
 
         self.gemini_validator = GeminiValidator()
+
+    def show_links_photos_buttons(self):
+        banner = Banner(self.master, self.settings.get('links_photos', []))
+        banner.show()
 
 def get_taskbar_height():
     """Get taskbar height for Windows, return 0 for other systems."""
