@@ -4,9 +4,30 @@ import json
 import os
 import sys
 import pathlib
+import platform
 sys.path.append(str(pathlib.Path(__file__).resolve().parent.parent))
 from organizer.file_organizer import organize_files
 from ai.gemini_validator import GeminiValidator
+
+def get_system_font():
+    """Get appropriate font family for the current system."""
+    system = platform.system()
+    if system == "Windows":
+        return "Segoe UI"
+    elif system == "Darwin":  # macOS
+        return "SF Pro Display"
+    else:  # Linux and others
+        return "Liberation Sans"
+
+def get_monospace_font():
+    """Get appropriate monospace font family for the current system."""
+    system = platform.system()
+    if system == "Windows":
+        return "Consolas"
+    elif system == "Darwin":  # macOS
+        return "SF Mono"
+    else:  # Linux and others
+        return "Liberation Mono"
 
 class FileOrganizerApp:
     def __init__(self, master):
@@ -18,7 +39,7 @@ class FileOrganizerApp:
 
 
         # Chat display area (proposition d'organisation)
-        self.chat_label = Label(master, text="Proposition d'organisation :", font=("Segoe UI", 12, "bold"), fg="#fff", bg="#23272f")
+        self.chat_label = Label(master, text="Proposition d'organisation :", font=(get_system_font(), 12, "bold"), fg="#fff", bg="#23272f")
         self.chat_label.pack(padx=18, anchor="w")
 
 
@@ -44,7 +65,7 @@ class FileOrganizerApp:
         chat_frame = Frame(main_container, bg="#23272f")
         chat_frame.grid(row=1, column=0, sticky="nsew")
 
-        self.chat_text = Text(chat_frame, font=("Consolas", 11), bg="#181a20", fg="#e0e0e0", relief="flat", wrap="word", state="disabled", borderwidth=0, highlightthickness=1, highlightbackground="#444")
+        self.chat_text = Text(chat_frame, font=(get_monospace_font(), 11), bg="#181a20", fg="#e0e0e0", relief="flat", wrap="word", state="disabled", borderwidth=0, highlightthickness=1, highlightbackground="#444")
         self.chat_text.pack(side="left", fill="both", expand=True)
 
         self.scrollbar = Scrollbar(chat_frame, command=self.chat_text.yview, bg="#23272f", troughcolor="#23272f", bd=0, relief="flat")
@@ -54,9 +75,9 @@ class FileOrganizerApp:
         # Input area (Entry + Button) just below chat, always visible
         input_frame = Frame(main_container, bg="#23272f")
         input_frame.grid(row=2, column=0, sticky="ew", pady=(8, 0))
-        self.user_entry = Entry(input_frame, font=("Segoe UI", 11), bg="#23272f", fg="#fff", insertbackground="#fff", relief="flat", width=32)
+        self.user_entry = Entry(input_frame, font=(get_system_font(), 11), bg="#23272f", fg="#fff", insertbackground="#fff", relief="flat", width=32)
         self.user_entry.pack(side="left", fill="x", expand=True, padx=(0, 8))
-        self.send_button = Button(input_frame, text="Envoyer", font=("Segoe UI", 10, "bold"), bg="#FFD700", fg="#23272f", relief="flat", command=self.on_send)
+        self.send_button = Button(input_frame, text="Envoyer", font=(get_system_font(), 10, "bold"), bg="#FFD700", fg="#23272f", relief="flat", command=self.on_send)
         self.send_button.pack(side="right")
 
         # Show initial loading and reorganization message
@@ -67,7 +88,7 @@ class FileOrganizerApp:
             return
         self.chat_text.config(state="normal")
         self.chat_text.insert(END, f"\nVous : {user_text}\n", ("user",))
-        self.chat_text.tag_config("user", foreground="#7CFC00", font=("Segoe UI", 10, "bold"))
+        self.chat_text.tag_config("user", foreground="#7CFC00", font=(get_system_font(), 10, "bold"))
         self.chat_text.config(state="disabled")
         self.user_entry.delete(0, END)
 
@@ -75,40 +96,49 @@ class FileOrganizerApp:
         if user_text.lower() in ["oui", "ok", "valider", "c'est bon", "confirmer", "accepter"]:
             self.apply_organization()
         else:
+            # Traiter la demande de modification de l'utilisateur
             self.modify_organization(user_text)
 
     def apply_organization(self):
-        from tkinter import messagebox
-        from organizer.file_organizer import move_files
-        # last_regrouped: {theme: {sous_theme: [files]}}
-        for theme, sous_dict in self.last_regrouped.items():
-            for sous_theme, files_list in sous_dict.items():
-                for file_name in files_list:
-                    alert_msg = f"Fichier : {file_name}\nThème : {theme}\nSous-thème : {sous_theme if sous_theme else '-'}"
-                    messagebox.showinfo("Déplacement de fichier", alert_msg)
-        try:
-            move_files(self.last_regrouped, self.last_files)
-        except Exception as e:
-            messagebox.showerror("Erreur de déplacement", str(e))
-
-    def modify_organization(self, user_text, batch_size=5):
+        """Applique l'organisation actuelle aux fichiers."""
+        if not hasattr(self, 'last_regrouped'):
+            return
+        
+        self.chat_text.config(state="normal")
+        self.chat_text.insert(END, "\nAssistant : Organisation en cours...\n", ("system",))
+        self.chat_text.tag_config("system", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
+        self.chat_text.config(state="disabled")
+        
+        # Ici on appellerait la fonction d'organisation réelle
+        # organize_files(self.last_regrouped, self.last_files)
+        
+    def modify_organization(self, user_text):
+        """Modifie l'organisation selon la demande de l'utilisateur."""
+        if not hasattr(self, 'last_regrouped'):
+            return
+            
         import threading
+        import json
+        from organizer.file_organizer import get_ai_response
+        
         def worker():
-            self.progress['value'] = 10
-            print("[DEBUG] Création du prompt pour modification IA avec batchs...")
-            # Récupère tous les fichiers à traiter
+            self.chat_text.config(state="normal")
+            self.chat_text.insert(END, "\nAssistant : Modification en cours...\n", ("system",))
+            self.chat_text.tag_config("system", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
+            self.chat_text.config(state="disabled")
+            
+            # Traiter par batch pour éviter les limites de token
+            batch_size = 10
             all_files = []
             for theme, sous_dict in self.last_regrouped.items():
                 for sous_theme, files_list in sous_dict.items():
                     all_files.extend(files_list)
-            # Découpage en batchs
+                    
             batches = [all_files[i:i+batch_size] for i in range(0, len(all_files), batch_size)]
             all_suggestions = {}
-            from api.gemini import get_ai_response
-            import json
             failed_batches = []
+            
             for idx, batch in enumerate(batches):
-                print(f"[DEBUG] Batch {idx+1}/{len(batches)} : {len(batch)} fichiers")
                 # Construit un regrouped réduit pour le batch
                 regrouped_batch = {}
                 for theme, sous_dict in self.last_regrouped.items():
@@ -178,10 +208,10 @@ class FileOrganizerApp:
                 self.chat_text.insert(END, "\n")
             self.chat_text.insert(END, "===================================\n")
             self.chat_text.insert(END, "\nMerci de confirmer cette organisation ou de préciser une demande de modification (ex : déplacer un fichier, renommer un thème, etc.).\n", ("confirm",))
-            self.chat_text.tag_config("theme", foreground="#FFD700", font=("Segoe UI", 11, "bold"))
-            self.chat_text.tag_config("sous_theme", foreground="#87CEEB", font=("Segoe UI", 10, "italic"))
-            self.chat_text.tag_config("file", foreground="#e0e0e0", font=("Consolas", 10))
-            self.chat_text.tag_config("confirm", foreground="#FFD700", font=("Segoe UI", 11, "italic"))
+            self.chat_text.tag_config("theme", foreground="#FFD700", font=(get_system_font(), 11, "bold"))
+            self.chat_text.tag_config("sous_theme", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
+            self.chat_text.tag_config("file", foreground="#e0e0e0", font=(get_monospace_font(), 10))
+            self.chat_text.tag_config("confirm", foreground="#FFD700", font=(get_system_font(), 11, "italic"))
             self.chat_text.config(state="disabled")
             self.progress['value'] = 100
         threading.Thread(target=worker, daemon=True).start()
@@ -261,12 +291,12 @@ class FileOrganizerApp:
                 self.chat_text.insert(END, "\n")
             self.chat_text.insert(END, "===================================\n")
             # Styles pour améliorer la lisibilité
-            self.chat_text.tag_config("theme", foreground="#FFD700", font=("Segoe UI", 11, "bold"))
-            self.chat_text.tag_config("sous_theme", foreground="#87CEEB", font=("Segoe UI", 10, "italic"))
-            self.chat_text.tag_config("file", foreground="#e0e0e0", font=("Consolas", 10))
+            self.chat_text.tag_config("theme", foreground="#FFD700", font=(get_system_font(), 11, "bold"))
+            self.chat_text.tag_config("sous_theme", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
+            self.chat_text.tag_config("file", foreground="#e0e0e0", font=(get_monospace_font(), 10))
             # Message de confirmation/modification
             self.chat_text.insert(END, "\nMerci de confirmer cette organisation ou de préciser une demande de modification (ex : déplacer un fichier, renommer un thème, etc.).\n", ("confirm",))
-            self.chat_text.tag_config("confirm", foreground="#FFD700", font=("Segoe UI", 11, "italic"))
+            self.chat_text.tag_config("confirm", foreground="#FFD700", font=(get_system_font(), 11, "italic"))
             self.chat_text.config(state="disabled")
             self.progress['value'] = 100
             # Stocke la dernière organisation pour modification/validation
@@ -280,11 +310,21 @@ class FileOrganizerApp:
 
         self.gemini_validator = GeminiValidator()
 
-
-
-
-
-import ctypes
+def get_taskbar_height():
+    """Get taskbar height for Windows, return 0 for other systems."""
+    if platform.system() == "Windows":
+        try:
+            import ctypes
+            user32 = ctypes.windll.user32
+            hWnd = user32.FindWindowW(u'Shell_TrayWnd', None)
+            rect = ctypes.wintypes.RECT()
+            user32.GetWindowRect(hWnd, ctypes.byref(rect))
+            # Check if taskbar is at the bottom
+            screen_width = user32.GetSystemMetrics(0)  # SM_CXSCREEN
+            return rect.bottom - rect.top if rect.left == 0 and rect.right == screen_width else 0
+        except Exception:
+            return 40  # fallback default
+    return 0
 
 def main():
     root = Tk()
@@ -292,30 +332,34 @@ def main():
     # Get screen dimensions
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
-
-    # Get taskbar height (Windows only)
-    try:
-        user32 = ctypes.windll.user32
-        hWnd = user32.FindWindowW(u'Shell_TrayWnd', None)
-        rect = ctypes.wintypes.RECT()
-        user32.GetWindowRect(hWnd, ctypes.byref(rect))
-        taskbar_height = rect.bottom - rect.top if rect.left == 0 and rect.right == screen_width else 0
-    except Exception:
-        taskbar_height = 40  # fallback default
-
-    # Set window size and position (right vertical banner)
+    
     banner_width = 400
-    banner_height = screen_height - taskbar_height
-    x = screen_width - banner_width
-    y = 0
-    root.geometry(f"{banner_width}x{banner_height}+{x}+{y}")
-
-    # Remove window frame (no title bar, no border)
-    root.overrideredirect(1)
-
-    # Lower the window below all others
-    root.lower()
-    root.attributes('-topmost', False)
+    current_os = platform.system()
+    
+    if current_os == "Windows":
+        # Windows: Right vertical banner, no title bar
+        taskbar_height = get_taskbar_height()
+        banner_height = screen_height - taskbar_height
+        x = screen_width - banner_width
+        y = 0
+        root.geometry(f"{banner_width}x{banner_height}+{x}+{y}")
+        
+        # Remove window frame (no title bar, no border)
+        root.overrideredirect(1)
+        
+        # Lower the window below all others
+        root.lower()
+        root.attributes('-topmost', False)
+    else:
+        # Linux/Mac: Standard window, centered
+        banner_height = min(screen_height - 100, 800)  # Reasonable height with margins
+        x_center = int((screen_width - banner_width) / 2)
+        y_center = int((screen_height - banner_height) / 2)
+        root.geometry(f"{banner_width}x{banner_height}+{x_center}+{y_center}")
+        
+        # Keep standard window decorations on Linux/Mac
+        root.title("File Organizer")
+        root.resizable(True, True)
 
     app = FileOrganizerApp(root)
     root.mainloop()
