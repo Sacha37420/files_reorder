@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Entry, Button, Text, Scrollbar, END, Frame
+from tkinter import Tk, Label, Entry, Button, Text, Scrollbar, END, Frame, Listbox, Toplevel, filedialog
 from tkinter.ttk import Progressbar
 import json
 import os
@@ -72,16 +72,140 @@ class FileOrganizerApp:
         self.scrollbar.pack(side='right', fill='y')
         self.chat_text.config(yscrollcommand=self.scrollbar.set)
 
-        # Input area (Entry + Button) just below chat, always visible
+        # Input area (Entry + Buttons) just below chat, always visible
         input_frame = Frame(main_container, bg="#23272f")
         input_frame.grid(row=2, column=0, sticky="ew", pady=(8, 0))
         self.user_entry = Entry(input_frame, font=(get_system_font(), 11), bg="#23272f", fg="#fff", insertbackground="#fff", relief="flat", width=32)
         self.user_entry.pack(side="left", fill="x", expand=True, padx=(0, 8))
+        
+        # Settings button
+        self.settings_button = Button(input_frame, text="⚙️", font=(get_system_font(), 10, "bold"), bg="#6c757d", fg="#fff", relief="flat", command=self.open_settings, width=3)
+        self.settings_button.pack(side="right", padx=(0, 4))
+        
         self.send_button = Button(input_frame, text="Envoyer", font=(get_system_font(), 10, "bold"), bg="#FFD700", fg="#23272f", relief="flat", command=self.on_send)
         self.send_button.pack(side="right")
 
+        # Load settings
+        self.settings = self.load_settings()
+        
         # Show initial loading and reorganization message
         self.show_initial_message()
+    
+    def load_settings(self):
+        """Load settings from configuration file."""
+        try:
+            import json
+            with open('settings.json', 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            # Default settings - use default user directories
+            from organizer.file_organizer import get_default_user_dirs
+            default_dirs = get_default_user_dirs()
+            return {
+                'nas_url': '',
+                'scan_folders': default_dirs
+            }
+    
+    def save_settings(self):
+        """Save settings to configuration file."""
+        try:
+            import json
+            with open('settings.json', 'w', encoding='utf-8') as f:
+                json.dump(self.settings, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            print(f"Error saving settings: {e}")
+    
+    def open_settings(self):
+        """Open the settings configuration window."""
+        self.settings_window = Toplevel(self.master)
+        self.settings_window.title("Paramètres")
+        self.settings_window.configure(bg="#23272f")
+        self.settings_window.geometry("500x400")
+        self.settings_window.resizable(False, False)
+        
+        # Center the settings window
+        self.settings_window.transient(self.master)
+        self.settings_window.grab_set()
+        
+        # Position relative to parent window
+        x = self.master.winfo_x() - 520  # Place to the left of main window
+        y = self.master.winfo_y()
+        self.settings_window.geometry(f"500x400+{x}+{y}")
+        
+        # NAS URL section
+        nas_label = Label(self.settings_window, text="URL du NAS:", font=(get_system_font(), 12, "bold"), fg="#fff", bg="#23272f")
+        nas_label.pack(pady=(20, 5), anchor="w", padx=20)
+        
+        self.nas_entry = Entry(self.settings_window, font=(get_system_font(), 11), bg="#181a20", fg="#e0e0e0", insertbackground="#fff", relief="flat", width=60)
+        self.nas_entry.pack(pady=(0, 15), padx=20, fill="x")
+        self.nas_entry.insert(0, self.settings.get('nas_url', ''))
+        
+        # Scan folders section
+        folders_label = Label(self.settings_window, text="Dossiers à scanner:", font=(get_system_font(), 12, "bold"), fg="#fff", bg="#23272f")
+        folders_label.pack(pady=(0, 5), anchor="w", padx=20)
+        
+        # Frame for folders list and buttons
+        folders_frame = Frame(self.settings_window, bg="#23272f")
+        folders_frame.pack(fill="both", expand=True, padx=20, pady=(0, 20))
+        
+        # Listbox for folders
+        self.folders_listbox = Listbox(folders_frame, font=(get_monospace_font(), 10), bg="#181a20", fg="#e0e0e0", selectbackground="#FFD700", selectforeground="#23272f", relief="flat", height=8)
+        self.folders_listbox.pack(side="left", fill="both", expand=True)
+        
+        # Scrollbar for listbox
+        folders_scrollbar = Scrollbar(folders_frame, command=self.folders_listbox.yview, bg="#23272f", troughcolor="#23272f")
+        folders_scrollbar.pack(side="right", fill="y")
+        self.folders_listbox.config(yscrollcommand=folders_scrollbar.set)
+        
+        # Populate listbox with current folders
+        for folder in self.settings.get('scan_folders', []):
+            self.folders_listbox.insert(END, folder)
+        
+        # Buttons frame
+        buttons_frame = Frame(self.settings_window, bg="#23272f")
+        buttons_frame.pack(fill="x", padx=20, pady=(0, 20))
+        
+        # Add folder button
+        add_button = Button(buttons_frame, text="Ajouter dossier", font=(get_system_font(), 10), bg="#28a745", fg="#fff", relief="flat", command=self.add_folder)
+        add_button.pack(side="left", padx=(0, 10))
+        
+        # Remove folder button
+        remove_button = Button(buttons_frame, text="Supprimer", font=(get_system_font(), 10), bg="#dc3545", fg="#fff", relief="flat", command=self.remove_folder)
+        remove_button.pack(side="left", padx=(0, 10))
+        
+        # Save and Cancel buttons
+        action_frame = Frame(self.settings_window, bg="#23272f")
+        action_frame.pack(fill="x", padx=20, pady=(0, 20))
+        
+        cancel_button = Button(action_frame, text="Annuler", font=(get_system_font(), 10), bg="#6c757d", fg="#fff", relief="flat", command=self.settings_window.destroy)
+        cancel_button.pack(side="right", padx=(10, 0))
+        
+        save_button = Button(action_frame, text="Sauvegarder", font=(get_system_font(), 10, "bold"), bg="#FFD700", fg="#23272f", relief="flat", command=self.save_settings_and_close)
+        save_button.pack(side="right")
+    
+    def add_folder(self):
+        """Add a folder to the scan list."""
+        folder = filedialog.askdirectory(title="Sélectionner un dossier à scanner")
+        if folder and folder not in self.get_current_folders_list():
+            self.folders_listbox.insert(END, folder)
+    
+    def remove_folder(self):
+        """Remove selected folder from the scan list."""
+        selection = self.folders_listbox.curselection()
+        if selection:
+            self.folders_listbox.delete(selection[0])
+    
+    def get_current_folders_list(self):
+        """Get the current list of folders from the listbox."""
+        return [self.folders_listbox.get(i) for i in range(self.folders_listbox.size())]
+    
+    def save_settings_and_close(self):
+        """Save the settings and close the settings window."""
+        self.settings['nas_url'] = self.nas_entry.get().strip()
+        self.settings['scan_folders'] = self.get_current_folders_list()
+        self.save_settings()
+        self.settings_window.destroy()
+
     def on_send(self):
         user_text = self.user_entry.get().strip()
         if not user_text:
@@ -258,10 +382,22 @@ class FileOrganizerApp:
                 time.sleep(0.5)
             # Get real organization suggestion
             self.progress['value'] = 30
-            dirs = get_default_user_dirs()
+            
+            # Use configured folders or default ones if none configured
+            dirs = self.settings.get('scan_folders', [])
+            if not dirs:
+                from organizer.file_organizer import get_default_user_dirs
+                dirs = get_default_user_dirs()
+                # Update settings with default directories for next time
+                self.settings['scan_folders'] = dirs
+                self.save_settings()
+                
             files = []
             for d in dirs:
-                files.extend(get_all_files(d))
+                if os.path.exists(d):
+                    files.extend(get_all_files(d))
+                else:
+                    print(f"Warning: Directory {d} does not exist")
             self.progress['value'] = 60
             suggestions = self.gemini_validator.suggest_schema(files, batch_size=5)
             self.progress['value'] = 90
@@ -351,15 +487,21 @@ def main():
         root.lower()
         root.attributes('-topmost', False)
     else:
-        # Linux/Mac: Standard window, centered
-        banner_height = min(screen_height - 100, 800)  # Reasonable height with margins
-        x_center = int((screen_width - banner_width) / 2)
-        y_center = int((screen_height - banner_height) / 2)
-        root.geometry(f"{banner_width}x{banner_height}+{x_center}+{y_center}")
+        # Linux/Mac: Same as Windows - right vertical banner, no title bar
+        banner_height = screen_height  # No taskbar consideration on Linux
+        x = screen_width - banner_width
+        y = 0
+        root.geometry(f"{banner_width}x{banner_height}+{x}+{y}")
         
-        # Keep standard window decorations on Linux/Mac
-        root.title("File Organizer")
-        root.resizable(True, True)
+        # Remove window frame (no title bar, no border)
+        root.overrideredirect(1)
+        
+        # Lower the window below all others (may not work on all Linux window managers)
+        try:
+            root.lower()
+            root.attributes('-topmost', False)
+        except Exception:
+            pass  # Some Linux window managers may not support these attributes
 
     app = FileOrganizerApp(root)
     root.mainloop()
