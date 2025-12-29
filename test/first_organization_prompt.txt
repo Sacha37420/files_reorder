@@ -1,0 +1,222 @@
+Voici une liste de fichiers avec pour chacun : nom, chemin, date de création et un extrait du contenu s'il est lisible. Propose une organisation thématique : pour chaque fichier, indique le sujet ou thème principal auquel il appartient (ex : Factures, Cours, Photos, Divers, etc.). Retourne un dictionnaire JSON où chaque clé est le nom du fichier et la valeur est le sujet proposé.
+
+Nom : desktop.ini | Chemin : C:\Users\sacha\Documents\desktop.ini | Date : 2024-07-24 15:57:10 | Extrait : 
+Nom : keywords.txt | Chemin : C:\Users\sacha\Documents\Arduino\libraries\SparkFun_ADXL345_Arduino_Library\keywords.txt | Date : 2025-01-11 10:58:20 | Extrait : #######################################
+# Syntax Coloring Map For ADXL345
+#######################################
+
+#######################################
+# Library (KEYWORD1)
+########################
+Nom : library.properties | Chemin : C:\Users\sacha\Documents\Arduino\libraries\SparkFun_ADXL345_Arduino_Library\library.properties | Date : 2025-01-11 10:58:20 | Extrait : 
+Nom : README.md | Chemin : C:\Users\sacha\Documents\Arduino\libraries\SparkFun_ADXL345_Arduino_Library\README.md | Date : 2025-01-11 10:58:20 | Extrait : 
+Nom : SparkFun_ADXL345_Calibration.ino | Chemin : C:\Users\sacha\Documents\Arduino\libraries\SparkFun_ADXL345_Arduino_Library\examples\SparkFun_ADXL345_Calibration\SparkFun_ADXL345_Calibration.ino | Date : 2025-01-11 10:58:20 | Extrait : 
+Nom : SparkFun_ADXL345_Example.ino | Chemin : C:\Users\sacha\Documents\Arduino\libraries\SparkFun_ADXL345_Arduino_Library\examples\SparkFun_ADXL345_Example\SparkFun_ADXL345_Example.ino | Date : 2025-01-11 10:58:20 | Extrait : 
+Nom : SparkFun_BabyBlynkMonitorThing.ino | Chemin : C:\Users\sacha\Documents\Arduino\libraries\SparkFun_ADXL345_Arduino_Library\examples\SparkFun_BabyBlynkMonitorThing\SparkFun_BabyBlynkMonitorThing.ino | Date : 2025-01-11 10:58:20 | Extrait : 
+Nom : SparkFun_ADXL345.cpp | Chemin : C:\Users\sacha\Documents\Arduino\libraries\SparkFun_ADXL345_Arduino_Library\src\SparkFun_ADXL345.cpp | Date : 2025-01-11 10:58:20 | Extrait : 
+Nom : SparkFun_ADXL345.h | Chemin : C:\Users\sacha\Documents\Arduino\libraries\SparkFun_ADXL345_Arduino_Library\src\SparkFun_ADXL345.h | Date : 2025-01-11 10:58:20 | Extrait : 
+Nom : .gitignore | Chemin : C:\Users\sacha\Documents\Arduino\libraries\TM1637\.gitignore | Date : 2025-01-11 10:27:50 | Extrait : 
+Nom : .travis.yml | Chemin : C:\Users\sacha\Documents\Arduino\libraries\TM1637\.travis.yml | Date : 2025-01-11 10:27:50 | Extrait : 
+Nom : keywords.txt | Chemin : C:\Users\sacha\Documents\Arduino\libraries\TM1637\keywords.txt | Date : 2025-01-11 10:27:50 | Extrait : #######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+TM1637Display		KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWOR
+Nom : library.json | Chemin : C:\Users\sacha\Documents\Arduino\libraries\TM1637\library.json | Date : 2025-01-11 10:27:50 | Extrait : {"name": "TM1637", "keywords": "LED, TM1637", "description": "Arduino library for TM1637 (LED Driver)", "repository": {"type": "git", "url": "https://github.com/avishorp/TM1637.git"}, "frameworks": "a
+Nom : library.properties | Chemin : C:\Users\sacha\Documents\Arduino\libraries\TM1637\library.properties | Date : 2025-01-11 10:27:50 | Extrait : 
+Nom : LICENSE | Chemin : C:\Users\sacha\Documents\Arduino\libraries\TM1637\LICENSE | Date : 2025-01-11 10:27:50 | Extrait : 
+Nom : platformio.ini | Chemin : C:\Users\sacha\Documents\Arduino\libraries\TM1637\platformio.ini | Date : 2025-01-11 10:27:50 | Extrait : 
+Nom : README.md | Chemin : C:\Users\sacha\Documents\Arduino\libraries\TM1637\README.md | Date : 2025-01-11 10:27:50 | Extrait : 
+Nom : release_notes.md | Chemin : C:\Users\sacha\Documents\Arduino\libraries\TM1637\release_notes.md | Date : 2025-01-11 10:27:50 | Extrait : 
+Nom : TM1637Display.cpp | Chemin : C:\Users\sacha\Documents\Arduino\libraries\TM1637\TM1637Display.cpp | Date : 2025-01-11 10:27:50 | Extrait : 
+Nom : TM1637Display.h | Chemin : C:\Users\sacha\Documents\Arduino\libraries\TM1637\TM1637Display.h | Date : 2025-01-11 10:27:50 | Extrait : 
+Nom : TM1637_ V2.4.pdf | Chemin : C:\Users\sacha\Documents\Arduino\libraries\TM1637\docs\TM1637_ V2.4.pdf | Date : 2025-01-11 10:27:50 | Extrait : 
+Nom : TM1637_V2.4_EN.pdf | Chemin : C:\Users\sacha\Documents\Arduino\libraries\TM1637\docs\TM1637_V2.4_EN.pdf | Date : 2025-01-11 10:27:50 | Extrait : 
+Nom : TM1637Test.ino | Chemin : C:\Users\sacha\Documents\Arduino\libraries\TM1637\examples\TM1637Test\TM1637Test.ino | Date : 2025-01-11 10:27:50 | Extrait : 
+Nom : LICENSE | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\LICENSE | Date : 2024-07-24 16:24:22 | Extrait : 
+Nom : README.md | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\README.md | Date : 2024-07-24 16:24:22 | Extrait : 
+Nom : animes.csv | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\Datas\animes.csv | Date : 2024-07-24 16:24:22 | Extrait : Nom;Saison;Lien(apres le radical de "https://***.darkino.***/")
+demon_slayer;1;/titles/87797/demon-slayer-kimetsu-no-yaiba
+Nom : geckodriver-0.35.0.zip | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\Datas\geckodriver-0.35.0.zip | Date : 2025-01-11 09:32:09 | Extrait : 
+Nom : Notation des téléchargements.csv | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\Datas\Notation des téléchargements.csv | Date : 2024-10-12 09:27:31 | Extrait : {
+	'Langue' : {'MULTI':5,'French':5,'TrueFrench':5,'English':3},
+	'Sous-titres':{'French':5,'Multi':5,'English':4},
+	'Qualite':{'WEB 1080p':5,'WEB 1080p (x265)':5,'Blu-Ray 1080p':5,'Blu-Ray 1080p (x26
+Nom : Notation des téléchargements.json | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\Datas\Notation des téléchargements.json | Date : 2024-10-12 09:36:52 | Extrait : {
+	'langue' : {'MULTI':5,'French':3,'TrueFrench':3,'English':3,'Japanese':3},
+	'soustitres':{'French':5,'Multi':5,'English':4},
+	'qualitee':{'WEB 1080p':5,'WEB 1080p (x265)':5,'Blu-Ray 1080p':5,'Blu-R
+Nom : chatter.py | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\src\chatter.py | Date : 2025-01-11 09:32:09 | Extrait : 
+Nom : Darkino.py | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\src\Darkino.py | Date : 2024-07-24 16:24:22 | Extrait : 
+Nom : Darkino_v2.py | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\src\Darkino_v2.py | Date : 2024-10-14 05:17:43 | Extrait : 
+Nom : example.json | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\src\example.json | Date : 2024-10-10 21:24:24 | Extrait : [{"serie": "sword art online", "saison": "2", "episode": "Episode 1", "qualité": ["Blu-Ray 1080p"], "langue": ["TrueFrench", "Japanese"], "sous-titres": ["French"], "lien": "https://1fichier.com/?ptzk
+Nom : geckodriver.log | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\src\geckodriver.log | Date : 2024-10-10 20:48:28 | Extrait : 
+Nom : one_piece.json | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\src\one_piece.json | Date : 2024-10-12 10:32:35 | Extrait : []
+Nom : sword_art_online.json | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\src\sword_art_online.json | Date : 2024-10-11 11:23:22 | Extrait : [{"serie": "sword art online", "saison": "4", "episode": "Episode 1", "qualité": ["Blu-Ray 1080p"], "langue": ["MULTI"], "sous-titres": [""], "lien": "https://1fichier.com/?v2n97n1jwdx27pjaww5q&af=254
+Nom : un_Fichier_api.py | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\src\un_Fichier_api.py | Date : 2024-07-24 16:24:22 | Extrait : 
+Nom : geckodriver-v0.35.0-linux-aarch64.tar.gz | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\src\geckodriver\base\geckodriver-v0.35.0-linux-aarch64.tar.gz | Date : 2025-01-11 09:32:09 | Extrait : 
+Nom : geckodriver-v0.35.0-linux32.tar.gz | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\src\geckodriver\base\geckodriver-v0.35.0-linux32.tar.gz | Date : 2025-01-11 09:32:09 | Extrait : 
+Nom : geckodriver-v0.35.0-linux64.tar.gz | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\src\geckodriver\base\geckodriver-v0.35.0-linux64.tar.gz | Date : 2025-01-11 09:32:09 | Extrait : 
+Nom : geckodriver-v0.35.0-macos-aarch64.tar.gz | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\src\geckodriver\base\geckodriver-v0.35.0-macos-aarch64.tar.gz | Date : 2025-01-11 09:32:09 | Extrait : 
+Nom : geckodriver-v0.35.0-macos.tar.gz | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\src\geckodriver\base\geckodriver-v0.35.0-macos.tar.gz | Date : 2025-01-11 09:32:09 | Extrait : 
+Nom : geckodriver-v0.35.0-win-aarch64.zip | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\src\geckodriver\base\geckodriver-v0.35.0-win-aarch64.zip | Date : 2025-01-11 09:32:09 | Extrait : 
+Nom : geckodriver-v0.35.0-win32.zip | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\src\geckodriver\base\geckodriver-v0.35.0-win32.zip | Date : 2025-01-11 09:32:09 | Extrait : 
+Nom : geckodriver.exe | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\src\geckodriver\win32\geckodriver.exe | Date : 2025-01-11 09:32:09 | Extrait : 
+Nom : un_Fichier_api.cpython-311.pyc | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\src\__pycache__\un_Fichier_api.cpython-311.pyc | Date : 2024-10-10 20:51:02 | Extrait : 
+Nom : un_Fichier_api.cpython-39.pyc | Chemin : C:\Users\sacha\Documents\GitHub\Downloader\src\__pycache__\un_Fichier_api.cpython-39.pyc | Date : 2024-07-24 16:24:22 | Extrait : 
+Nom : LICENSE | Chemin : C:\Users\sacha\Documents\GitHub\pythonServer\LICENSE | Date : 2024-07-24 16:18:16 | Extrait : 
+Nom : README.md | Chemin : C:\Users\sacha\Documents\GitHub\pythonServer\README.md | Date : 2024-07-24 16:18:16 | Extrait : 
+Nom : Battle.net-Setup.exe | Chemin : C:\Users\sacha\Downloads\Battle.net-Setup.exe | Date : 2025-06-14 10:51:15 | Extrait : 
+Nom : BookwormPup64_10.0.12.iso | Chemin : C:\Users\sacha\Downloads\BookwormPup64_10.0.12.iso | Date : 2025-12-27 15:10:27 | Extrait : 
+Nom : desktop.ini | Chemin : C:\Users\sacha\Downloads\desktop.ini | Date : 2024-07-24 15:57:10 | Extrait : 
+Nom : H_01_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_01_2010-2019.csv.gz | Date : 2025-06-21 21:42:22 | Extrait : 
+Nom : H_02_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_02_2010-2019.csv.gz | Date : 2025-06-21 21:42:25 | Extrait : 
+Nom : H_03_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_03_2010-2019.csv.gz | Date : 2025-06-21 21:44:49 | Extrait : 
+Nom : H_04_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_04_2010-2019.csv.gz | Date : 2025-06-21 21:44:52 | Extrait : 
+Nom : H_05_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_05_2010-2019.csv.gz | Date : 2025-06-21 21:44:54 | Extrait : 
+Nom : H_06_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_06_2010-2019.csv.gz | Date : 2025-06-21 21:44:56 | Extrait : 
+Nom : H_07_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_07_2010-2019.csv.gz | Date : 2025-06-21 21:45:02 | Extrait : 
+Nom : H_08_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_08_2010-2019.csv.gz | Date : 2025-06-21 21:45:05 | Extrait : 
+Nom : H_09_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_09_2010-2019.csv.gz | Date : 2025-06-21 21:45:08 | Extrait : 
+Nom : H_10_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_10_2010-2019.csv.gz | Date : 2025-06-21 21:45:12 | Extrait : 
+Nom : H_11_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_11_2010-2019.csv.gz | Date : 2025-06-21 21:45:15 | Extrait : 
+Nom : H_12_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_12_2010-2019.csv.gz | Date : 2025-06-21 21:45:18 | Extrait : 
+Nom : H_13_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_13_2010-2019.csv.gz | Date : 2025-06-21 21:46:23 | Extrait : 
+Nom : H_14_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_14_2010-2019.csv.gz | Date : 2025-06-21 21:46:26 | Extrait : 
+Nom : H_15_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_15_2010-2019.csv.gz | Date : 2025-06-21 21:46:29 | Extrait : 
+Nom : H_16_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_16_2010-2019.csv.gz | Date : 2025-06-21 21:46:31 | Extrait : 
+Nom : H_17_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_17_2010-2019.csv.gz | Date : 2025-06-21 21:46:35 | Extrait : 
+Nom : H_18_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_18_2010-2019.csv.gz | Date : 2025-06-21 21:46:39 | Extrait : 
+Nom : H_19_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_19_2010-2019.csv.gz | Date : 2025-06-21 21:46:48 | Extrait : 
+Nom : H_20_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_20_2010-2019.csv.gz | Date : 2025-06-21 21:46:50 | Extrait : 
+Nom : H_21_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_21_2010-2019.csv.gz | Date : 2025-06-21 21:46:53 | Extrait : 
+Nom : H_22_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_22_2010-2019.csv.gz | Date : 2025-06-21 21:46:58 | Extrait : 
+Nom : H_23_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_23_2010-2019.csv.gz | Date : 2025-06-21 21:47:01 | Extrait : 
+Nom : H_24_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_24_2010-2019.csv.gz | Date : 2025-06-21 21:47:04 | Extrait : 
+Nom : H_25_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_25_2010-2019.csv.gz | Date : 2025-06-21 21:47:13 | Extrait : 
+Nom : H_26_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_26_2010-2019.csv.gz | Date : 2025-06-21 21:47:15 | Extrait : 
+Nom : H_27_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_27_2010-2019.csv.gz | Date : 2025-06-21 21:47:18 | Extrait : 
+Nom : H_28_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_28_2010-2019.csv.gz | Date : 2025-06-21 21:47:21 | Extrait : 
+Nom : H_29_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_29_2010-2019.csv.gz | Date : 2025-06-21 21:47:27 | Extrait : 
+Nom : H_30_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_30_2010-2019.csv.gz | Date : 2025-06-21 21:47:30 | Extrait : 
+Nom : H_31_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_31_2010-2019.csv.gz | Date : 2025-06-21 21:47:39 | Extrait : 
+Nom : H_32_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_32_2010-2019.csv.gz | Date : 2025-06-21 21:47:41 | Extrait : 
+Nom : H_33_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_33_2010-2019.csv.gz | Date : 2025-06-21 21:47:44 | Extrait : 
+Nom : H_34_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_34_2010-2019.csv.gz | Date : 2025-06-21 21:47:47 | Extrait : 
+Nom : H_35_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_35_2010-2019.csv.gz | Date : 2025-06-21 21:47:52 | Extrait : 
+Nom : H_36_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_36_2010-2019.csv.gz | Date : 2025-06-21 21:47:55 | Extrait : 
+Nom : H_37_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_37_2010-2019.csv.gz | Date : 2025-06-21 21:48:01 | Extrait : 
+Nom : H_38_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_38_2010-2019.csv.gz | Date : 2025-06-21 21:48:07 | Extrait : 
+Nom : H_39_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_39_2010-2019.csv.gz | Date : 2025-06-21 21:48:11 | Extrait : 
+Nom : H_40_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_40_2010-2019.csv.gz | Date : 2025-06-21 21:48:14 | Extrait : 
+Nom : H_41_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_41_2010-2019.csv.gz | Date : 2025-06-21 21:48:17 | Extrait : 
+Nom : H_42_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_42_2010-2019.csv.gz | Date : 2025-06-21 21:48:19 | Extrait : 
+Nom : H_43_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_43_2010-2019.csv.gz | Date : 2025-06-21 21:48:25 | Extrait : 
+Nom : H_44_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_44_2010-2019.csv.gz | Date : 2025-06-21 21:48:29 | Extrait : 
+Nom : H_45_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_45_2010-2019.csv.gz | Date : 2025-06-21 21:48:32 | Extrait : 
+Nom : H_46_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_46_2010-2019.csv.gz | Date : 2025-06-21 21:48:35 | Extrait : 
+Nom : H_47_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_47_2010-2019.csv.gz | Date : 2025-06-21 21:48:38 | Extrait : 
+Nom : H_48_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_48_2010-2019.csv.gz | Date : 2025-06-21 21:48:41 | Extrait : 
+Nom : H_49_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_49_2010-2019.csv.gz | Date : 2025-06-21 21:48:46 | Extrait : 
+Nom : H_50_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_50_2010-2019.csv.gz | Date : 2025-06-21 21:48:49 | Extrait : 
+Nom : H_51_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_51_2010-2019.csv.gz | Date : 2025-06-21 21:48:52 | Extrait : 
+Nom : H_52_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_52_2010-2019.csv.gz | Date : 2025-06-21 21:48:56 | Extrait : 
+Nom : H_53_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_53_2010-2019.csv.gz | Date : 2025-06-21 21:48:59 | Extrait : 
+Nom : H_54_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_54_2010-2019.csv.gz | Date : 2025-06-21 21:49:02 | Extrait : 
+Nom : H_55_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_55_2010-2019.csv.gz | Date : 2025-06-21 21:49:11 | Extrait : 
+Nom : H_56_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_56_2010-2019.csv.gz | Date : 2025-06-21 21:49:14 | Extrait : 
+Nom : H_57_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_57_2010-2019.csv.gz | Date : 2025-06-21 21:49:16 | Extrait : 
+Nom : H_58_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_58_2010-2019.csv.gz | Date : 2025-06-21 21:49:19 | Extrait : 
+Nom : H_59_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_59_2010-2019.csv.gz | Date : 2025-06-21 21:49:22 | Extrait : 
+Nom : H_60_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_60_2010-2019.csv.gz | Date : 2025-06-21 21:49:24 | Extrait : 
+Nom : H_61_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_61_2010-2019.csv.gz | Date : 2025-06-21 21:49:29 | Extrait : 
+Nom : H_62_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_62_2010-2019.csv.gz | Date : 2025-06-21 21:49:30 | Extrait : 
+Nom : H_63_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_63_2010-2019.csv.gz | Date : 2025-06-21 21:49:37 | Extrait : 
+Nom : H_64_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_64_2010-2019.csv.gz | Date : 2025-06-21 21:49:38 | Extrait : 
+Nom : H_65_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_65_2010-2019.csv.gz | Date : 2025-06-21 21:49:51 | Extrait : 
+Nom : H_66_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_66_2010-2019.csv.gz | Date : 2025-06-21 21:49:42 | Extrait : 
+Nom : H_67_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_67_2010-2019.csv.gz | Date : 2025-06-21 21:49:57 | Extrait : 
+Nom : H_68_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_68_2010-2019.csv.gz | Date : 2025-06-21 21:49:58 | Extrait : 
+Nom : H_69_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_69_2010-2019.csv.gz | Date : 2025-06-21 21:50:02 | Extrait : 
+Nom : H_70_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_70_2010-2019.csv.gz | Date : 2025-06-21 21:50:03 | Extrait : 
+Nom : H_71_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_71_2010-2019.csv.gz | Date : 2025-06-21 21:50:08 | Extrait : 
+Nom : H_72_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_72_2010-2019.csv.gz | Date : 2025-06-21 21:50:08 | Extrait : 
+Nom : H_73_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_73_2010-2019.csv.gz | Date : 2025-06-21 21:50:16 | Extrait : 
+Nom : H_74_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_74_2010-2019.csv.gz | Date : 2025-06-21 21:50:16 | Extrait : 
+Nom : H_75_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_75_2010-2019.csv.gz | Date : 2025-06-21 21:50:29 | Extrait : 
+Nom : H_76_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_76_2010-2019.csv.gz | Date : 2025-06-21 21:50:22 | Extrait : 
+Nom : H_77_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_77_2010-2019.csv.gz | Date : 2025-06-21 21:50:36 | Extrait : 
+Nom : H_78_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_78_2010-2019.csv.gz | Date : 2025-06-21 21:50:38 | Extrait : 
+Nom : H_79_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_79_2010-2019.csv.gz | Date : 2025-06-21 21:50:45 | Extrait : 
+Nom : H_80_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_80_2010-2019.csv.gz | Date : 2025-06-21 21:50:47 | Extrait : 
+Nom : H_81_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_81_2010-2019.csv.gz | Date : 2025-06-21 21:50:51 | Extrait : 
+Nom : H_82_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_82_2010-2019.csv.gz | Date : 2025-06-21 21:50:55 | Extrait : 
+Nom : H_83_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_83_2010-2019.csv.gz | Date : 2025-06-21 21:50:58 | Extrait : 
+Nom : H_84_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_84_2010-2019.csv.gz | Date : 2025-06-21 21:51:02 | Extrait : 
+Nom : H_85_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_85_2010-2019.csv.gz | Date : 2025-06-21 21:51:23 | Extrait : 
+Nom : H_86_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_86_2010-2019.csv.gz | Date : 2025-06-21 21:51:17 | Extrait : 
+Nom : H_87_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_87_2010-2019.csv.gz | Date : 2025-06-21 21:51:26 | Extrait : 
+Nom : H_88_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_88_2010-2019.csv.gz | Date : 2025-06-21 21:51:29 | Extrait : 
+Nom : H_89_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_89_2010-2019.csv.gz | Date : 2025-06-21 21:51:32 | Extrait : 
+Nom : H_90_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_90_2010-2019.csv.gz | Date : 2025-06-21 21:51:33 | Extrait : 
+Nom : H_91_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_91_2010-2019.csv.gz | Date : 2025-06-21 21:51:44 | Extrait : 
+Nom : H_92_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_92_2010-2019.csv.gz | Date : 2025-06-21 21:51:45 | Extrait : 
+Nom : H_93_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_93_2010-2019.csv.gz | Date : 2025-06-21 21:51:50 | Extrait : 
+Nom : H_94_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_94_2010-2019.csv.gz | Date : 2025-06-21 21:51:50 | Extrait : 
+Nom : H_95_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_95_2010-2019.csv.gz | Date : 2025-06-21 21:51:55 | Extrait : 
+Nom : H_971_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_971_2010-2019.csv.gz | Date : 2025-06-21 21:52:01 | Extrait : 
+Nom : H_972_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_972_2010-2019.csv.gz | Date : 2025-06-21 21:52:09 | Extrait : 
+Nom : H_973_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_973_2010-2019.csv.gz | Date : 2025-06-21 21:52:14 | Extrait : 
+Nom : H_974_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_974_2010-2019.csv.gz | Date : 2025-06-21 21:52:18 | Extrait : 
+Nom : H_975_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_975_2010-2019.csv.gz | Date : 2025-06-21 21:52:24 | Extrait : 
+Nom : H_984_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_984_2010-2019.csv.gz | Date : 2025-06-21 21:52:28 | Extrait : 
+Nom : H_985_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_985_2010-2019.csv.gz | Date : 2025-06-21 21:52:34 | Extrait : 
+Nom : H_986_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_986_2010-2019.csv.gz | Date : 2025-06-21 21:52:45 | Extrait : 
+Nom : H_987_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_987_2010-2019.csv.gz | Date : 2025-06-21 21:52:49 | Extrait : 
+Nom : H_988_2010-2019.csv.gz | Chemin : C:\Users\sacha\Downloads\H_988_2010-2019.csv.gz | Date : 2025-06-21 21:52:53 | Extrait : 
+Nom : isotousb_setup.exe | Chemin : C:\Users\sacha\Downloads\isotousb_setup.exe | Date : 2025-12-26 09:53:16 | Extrait : 
+Nom : kubuntu-22.04.5-desktop-amd64.iso | Chemin : C:\Users\sacha\Downloads\kubuntu-22.04.5-desktop-amd64.iso | Date : 2025-12-26 09:21:43 | Extrait : 
+Nom : rufus-4.11p.exe | Chemin : C:\Users\sacha\Downloads\rufus-4.11p.exe | Date : 2025-12-27 13:14:36 | Extrait : 
+Nom : rufus.ini | Chemin : C:\Users\sacha\Downloads\rufus.ini | Date : 2025-12-27 13:14:54 | Extrait : 
+Nom : VisualStudioSetup.exe | Chemin : C:\Users\sacha\Downloads\VisualStudioSetup.exe | Date : 2025-08-08 08:20:34 | Extrait : 
+Nom : rufus.log | Chemin : C:\Users\sacha\Downloads\Rufus\rufus.log | Date : 2025-12-27 13:47:12 | Extrait : 
+Nom : core.img | Chemin : C:\Users\sacha\Downloads\Rufus\grub-2.06-13-deb12u1\core.img | Date : 2025-12-27 15:16:49 | Extrait : 
+Nom : core.img | Chemin : C:\Users\sacha\Downloads\Rufus\grub-2.06-kubuntu-22.04.5\core.img | Date : 2025-12-27 13:17:42 | Extrait : 
+Nom : ldlinux.bss | Chemin : C:\Users\sacha\Downloads\Rufus\syslinux-6.04\ldlinux.bss | Date : 2025-12-27 15:16:53 | Extrait : 
+Nom : ldlinux.sys | Chemin : C:\Users\sacha\Downloads\Rufus\syslinux-6.04\ldlinux.sys | Date : 2025-12-27 15:16:53 | Extrait : 
+Nom : ldlinux.bss | Chemin : C:\Users\sacha\Downloads\Rufus\syslinux-6.04\20200816\ldlinux.bss | Date : 2025-12-27 15:16:53 | Extrait : 
+Nom : ldlinux.sys | Chemin : C:\Users\sacha\Downloads\Rufus\syslinux-6.04\20200816\ldlinux.sys | Date : 2025-12-27 15:16:53 | Extrait : 
+Nom : Arduino IDE.lnk | Chemin : C:\Users\sacha\Desktop\Arduino IDE.lnk | Date : 2025-01-11 10:10:46 | Extrait : 
+Nom : desktop.ini | Chemin : C:\Users\sacha\Desktop\desktop.ini | Date : 2024-07-24 15:57:10 | Extrait : 
+Nom : GitHub Desktop.lnk | Chemin : C:\Users\sacha\Desktop\GitHub Desktop.lnk | Date : 2024-07-24 16:06:04 | Extrait : 
+Nom : Google Chrome.lnk | Chemin : C:\Users\sacha\Desktop\Google Chrome.lnk | Date : 2025-01-31 15:30:47 | Extrait : 
+Nom : JDownloader 2.lnk | Chemin : C:\Users\sacha\Desktop\JDownloader 2.lnk | Date : 2025-01-31 15:35:30 | Extrait : 
+Nom : sport.xlsx | Chemin : C:\Users\sacha\Desktop\sport.xlsx | Date : 2025-12-12 12:48:09 | Extrait : 
+Nom : Exemple.qgz | Chemin : C:\Users\sacha\Desktop\cd93_cycl\Exemple.qgz | Date : 2025-01-12 21:52:08 | Extrait : 
+Nom : BDTOPO_3-4_TOUSTHEMES_SHP_LAMB93_D093_2024-12-15.7z | Chemin : C:\Users\sacha\Desktop\cd93_cycl\src\BDTOPO_3-4_TOUSTHEMES_SHP_LAMB93_D093_2024-12-15.7z | Date : 2025-01-12 21:52:08 | Extrait : 
+Nom : COURBE_1-0__SHP_LAMB93_D093_2021-01-01.7z | Chemin : C:\Users\sacha\Desktop\cd93_cycl\src\COURBE_1-0__SHP_LAMB93_D093_2021-01-01.7z | Date : 2025-01-12 21:52:09 | Extrait : 
+Nom : intersections_elements_cyclables_courbes_de_hauteur.geojson | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\intersections_elements_cyclables_courbes_de_hauteur.geojson | Date : 2025-01-12 21:52:09 | Extrait : 
+Nom : intersections_elements_cyclables_courbes_de_hauteur.qmd | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\intersections_elements_cyclables_courbes_de_hauteur.qmd | Date : 2025-01-12 21:52:10 | Extrait : 
+Nom : points_de_niveau_exemple.geojson | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\points_de_niveau_exemple.geojson | Date : 2025-01-12 21:52:10 | Extrait : 
+Nom : TRONCON_DE_ROUTE_exemple.geojson | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\TRONCON_DE_ROUTE_exemple.geojson | Date : 2025-01-12 21:52:10 | Extrait : 
+Nom : zone_exemple.geojson | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\zone_exemple.geojson | Date : 2025-01-12 21:52:10 | Extrait : 
+Nom : _ags_GeoJson_0DE3E3AD62014D9D8E5BDFC994952653.geojson | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\_ags_GeoJson_0DE3E3AD62014D9D8E5BDFC994952653.geojson | Date : 2025-01-12 21:52:10 | Extrait : 
+Nom : _ags_GeoJson_0DE3E3AD62014D9D8E5BDFC994952653_exemple.geojson | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\_ags_GeoJson_0DE3E3AD62014D9D8E5BDFC994952653_exemple.geojson | Date : 2025-01-12 21:52:10 | Extrait : 
+Nom : _ags_GeoJson_BF548D4E3A9147DF89D099D6E1D5ABDB.geojson | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\_ags_GeoJson_BF548D4E3A9147DF89D099D6E1D5ABDB.geojson | Date : 2025-01-12 21:52:10 | Extrait : 
+Nom : _ags_GeoJson_BF548D4E3A9147DF89D099D6E1D5ABDB_zone_exemple.geojson | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\_ags_GeoJson_BF548D4E3A9147DF89D099D6E1D5ABDB_zone_exemple.geojson | Date : 2025-01-12 21:52:11 | Extrait : 
+Nom : _ags_GeoJson_BF548D4E3A9147DF89D099D6E1D5ABDB_zone_exemple.qmd | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\_ags_GeoJson_BF548D4E3A9147DF89D099D6E1D5ABDB_zone_exemple.qmd | Date : 2025-01-12 21:52:11 | Extrait : 
+Nom : COURBE_0640_6880.dbf | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE\1_DONNEES_LIVRAISON_2021-01-01\COURBE_1-0_SHP_LAMB93_D093_2021\COURBE_0640_6880.dbf | Date : 2025-01-12 21:52:47 | Extrait : 
+Nom : COURBE_0640_6880.prj | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE\1_DONNEES_LIVRAISON_2021-01-01\COURBE_1-0_SHP_LAMB93_D093_2021\COURBE_0640_6880.prj | Date : 2025-01-12 21:52:47 | Extrait : 
+Nom : COURBE_0640_6880.shp | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE\1_DONNEES_LIVRAISON_2021-01-01\COURBE_1-0_SHP_LAMB93_D093_2021\COURBE_0640_6880.shp | Date : 2025-01-12 21:52:47 | Extrait : 
+Nom : COURBE_0640_6880.shx | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE\1_DONNEES_LIVRAISON_2021-01-01\COURBE_1-0_SHP_LAMB93_D093_2021\COURBE_0640_6880.shx | Date : 2025-01-12 21:52:47 | Extrait : 
+Nom : COURBE_0640_6920.dbf | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE\1_DONNEES_LIVRAISON_2021-01-01\COURBE_1-0_SHP_LAMB93_D093_2021\COURBE_0640_6920.dbf | Date : 2025-01-12 21:52:47 | Extrait : 
+Nom : COURBE_0640_6920.prj | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE\1_DONNEES_LIVRAISON_2021-01-01\COURBE_1-0_SHP_LAMB93_D093_2021\COURBE_0640_6920.prj | Date : 2025-01-12 21:52:47 | Extrait : 
+Nom : COURBE_0640_6920.shp | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE\1_DONNEES_LIVRAISON_2021-01-01\COURBE_1-0_SHP_LAMB93_D093_2021\COURBE_0640_6920.shp | Date : 2025-01-12 21:52:47 | Extrait : 
+Nom : COURBE_0640_6920.shx | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE\1_DONNEES_LIVRAISON_2021-01-01\COURBE_1-0_SHP_LAMB93_D093_2021\COURBE_0640_6920.shx | Date : 2025-01-12 21:52:48 | Extrait : 
+Nom : TA_COURBE_D093.dbf | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE\3_SUPPLEMENTS_LIVRAISON_2021-01-01\COURBE_1-0_SHP_LAMB93_D093_2021\TA_COURBE_D093.dbf | Date : 2025-01-12 21:52:48 | Extrait : 
+Nom : TA_COURBE_D093.prj | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE\3_SUPPLEMENTS_LIVRAISON_2021-01-01\COURBE_1-0_SHP_LAMB93_D093_2021\TA_COURBE_D093.prj | Date : 2025-01-12 21:52:48 | Extrait : 
+Nom : TA_COURBE_D093.shp | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE\3_SUPPLEMENTS_LIVRAISON_2021-01-01\COURBE_1-0_SHP_LAMB93_D093_2021\TA_COURBE_D093.shp | Date : 2025-01-12 21:52:48 | Extrait : 
+Nom : TA_COURBE_D093.shx | Chemin : C:\Users\sacha\Desktop\cd93_cycl\travail\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE_1-0__SHP_LAMB93_D093_2021-01-01\COURBE\3_SUPPLEMENTS_LIVRAISON_2021-01-01\COURBE_1-0_SHP_LAMB93_D093_2021\TA_COURBE_D093.shx | Date : 2025-01-12 21:52:48 | Extrait : 
