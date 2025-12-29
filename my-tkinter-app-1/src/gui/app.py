@@ -8,44 +8,48 @@ sys.path.append(str(pathlib.Path(__file__).resolve().parent.parent))
 from organizer.file_organizer import organize_files
 from ai.gemini_validator import GeminiValidator
 
-class FileOrganizerApp:
-    def __init__(self, master):
-        self.master = master
-        master.title("File Organizer")
-        master.configure(bg="#23272f")
+import platform
 
-
-
-
-        # Chat display area (proposition d'organisation)
-        self.chat_label = Label(master, text="Proposition d'organisation :", font=("Segoe UI", 12, "bold"), fg="#fff", bg="#23272f")
-        self.chat_label.pack(padx=18, anchor="w")
-
-
-
-        # Main container to manage chat and input area
-        # Add top, right, and bottom margins
-        margin_top = 40
-        margin_bottom = 24
-        margin_right = 32
-        margin_left = 32
-        main_container = Frame(master, bg="#23272f")
-        main_container.place(x=margin_left, y=margin_top, relwidth=1, relheight=1, height=-(margin_top+margin_bottom), width=-(margin_left+margin_right))
-
-        # Layout: vertical (progress bar, chat, input)
-        main_container.grid_rowconfigure(1, weight=1)
-        main_container.grid_columnconfigure(0, weight=1)
-
-        # Progress bar above chat
-        self.progress = Progressbar(main_container, orient="horizontal", mode="determinate", length=200)
-        self.progress.grid(row=0, column=0, sticky="ew", pady=(0, 10))
-        self.progress['value'] = 0
-
-        chat_frame = Frame(main_container, bg="#23272f")
-        chat_frame.grid(row=1, column=0, sticky="nsew")
-
-        self.chat_text = Text(chat_frame, font=("Consolas", 11), bg="#181a20", fg="#e0e0e0", relief="flat", wrap="word", state="disabled", borderwidth=0, highlightthickness=1, highlightbackground="#444")
         self.chat_text.pack(side="left", fill="both", expand=True)
+    root = Tk()
+
+    # Get screen dimensions
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+
+    banner_width = 400
+    banner_height = screen_height
+    x = screen_width - banner_width
+    y = 0
+
+    current_os = platform.system()
+    if current_os == "Windows":
+        import ctypes
+        try:
+            user32 = ctypes.windll.user32
+            hWnd = user32.FindWindowW(u'Shell_TrayWnd', None)
+            rect = ctypes.wintypes.RECT()
+            user32.GetWindowRect(hWnd, ctypes.byref(rect))
+            taskbar_height = rect.bottom - rect.top if rect.left == 0 and rect.right == screen_width else 0
+        except Exception:
+            taskbar_height = 40  # fallback default
+        banner_height = screen_height - taskbar_height
+        root.geometry(f"{banner_width}x{banner_height}+{x}+{y}")
+        # Remove window frame (no title bar, no border)
+        root.overrideredirect(1)
+        # Lower the window below all others
+        root.lower()
+        root.attributes('-topmost', False)
+    else:
+        # Linux/Mac: fenêtre classique, centrée
+        root.geometry(f"{banner_width}x{banner_height}+{x}+{y}")
+        # Ne pas utiliser overrideredirect ni lower
+
+    app = FileOrganizerApp(root)
+    root.mainloop()
+
+if __name__ == "__main__":
+    main()
 
         self.scrollbar = Scrollbar(chat_frame, command=self.chat_text.yview, bg="#23272f", troughcolor="#23272f", bd=0, relief="flat")
         self.scrollbar.pack(side='right', fill='y')
