@@ -7,10 +7,7 @@ class GeminiValidator:
         """
         Envoie à l'IA la liste complète des fichiers, thèmes et sous-thèmes pour obtenir une organisation globale hiérarchique.
         """
-        try:
-            from api.gemini import get_ai_response
-        except ImportError:
-            from ..api.gemini import get_ai_response
+        from api.gemini import get_ai_response
 
         prompt = (
             "Voici la liste des fichiers, leur thème principal et leur sous-thème proposé :\n"
@@ -60,10 +57,7 @@ class GeminiValidator:
         # files est une liste de dicts avec name, path, date, excerpt
         # On traite par lots pour éviter de dépasser la limite de tokens
         import math
-        try:
-            from api.gemini import get_ai_response
-        except ImportError:
-            from ..api.gemini import get_ai_response
+        from api.gemini import get_ai_response
 
         all_results = {}
         n = len(files)
