@@ -81,10 +81,13 @@ def get_all_files(directory):
     for root, dirs, filenames in os.walk(directory):
         # Exclure les dossiers .git
         dirs[:] = [d for d in dirs if d != '.git']
+        excluded_exts = ['.lnk', '.exe', '.py', '.cpp', '.json']
         for file in filenames:
-            path = os.path.join(root, file)
             ext = os.path.splitext(file)[1].lower()
-            if ext in ['.txt', '.csv', '.json', '.docx', '.xlsx', '.xls']:
+            if ext in excluded_exts:
+                continue
+            path = os.path.join(root, file)
+            if ext in ['.txt', '.csv', '.docx', '.xlsx', '.xls']:
                 excerpt = extract_text_excerpt(path)
             else:
                 excerpt = ''

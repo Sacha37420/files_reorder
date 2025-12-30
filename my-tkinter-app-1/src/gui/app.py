@@ -244,7 +244,7 @@ class FileOrganizerApp:
             "Pour chaque fichier, indique le thème et le sous-thème (ou une chaîne vide si non pertinent).\n"
             "ATTENTION :\n"
             "- Réponds STRICTEMENT au format JSON ci-dessous, sans aucun texte avant ou après, sans tableau d'objets, sans clé supplémentaire.\n"
-            "- Utilise uniquement des guillemets doubles (\"") pour le JSON.\n"
+            "- Utilise uniquement des guillemets doubles (\") pour le JSON.\n"
             "- Ne modifie que les thèmes/sous-thèmes des fichiers concernés, laisse les autres inchangés.\n"
             "- N'invente pas de nouveaux fichiers.\n"
             "Exemple de réponse attendue :\n"
