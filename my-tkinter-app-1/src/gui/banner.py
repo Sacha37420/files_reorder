@@ -103,7 +103,7 @@ class Banner:
                     img_tk = ImageTk.PhotoImage(img)
                     self._link_images.append(img_tk)
                     from tkinter import Label
-                    lbl = Label(popup, image=img_tk, bg='', borderwidth=0, highlightthickness=0)
+                    lbl = Label(popup, image=img_tk, bg='white', borderwidth=0, highlightthickness=0)
                 lbl.place(x=start_x + idx * (btn_size + btn_pad), y=btn_y, width=btn_size, height=btn_size)
                 lbl.bind('<Button-1>', lambda e, u=url: webbrowser.open(u))
                 print(f"Banner: Image placed on label idx={idx}")

@@ -142,7 +142,7 @@ class FileOrganizerApp:
             
         import threading
         import json
-        from organizer.file_organizer import get_ai_response
+        from api.gemini import get_ai_response
         
         def worker():
             self.chat_panel.chat_text.config(state="normal")
@@ -296,98 +296,69 @@ class FileOrganizerApp:
                 from organizer.file_organizer import get_default_user_dirs
                 dirs = get_default_user_dirs()
                 # Update settings with default directories for next time
-                self.settings['scan_folders'] = dirs
-                self.save_settings()
-                
-            files = []
-            for d in dirs:
-                if os.path.exists(d):
-                    files.extend(get_all_files(d))
-                else:
-                    print(f"Warning: Directory {d} does not exist")
-            self.chat_panel.progress['value'] = 60
-            suggestions = self.gemini_validator.suggest_schema(files, batch_size=5)
-            self.chat_panel.progress['value'] = 90
-            # Regrouper les suggestions par thème et sous-thème
-            regrouped = {}
-            for file_name, info in suggestions.items():
-                theme = info.get('theme', 'Inconnu') or 'Inconnu'
-                sous_theme = info.get('sous_theme', '') or ''
-                if theme not in regrouped:
-                    regrouped[theme] = {}
-                if sous_theme not in regrouped[theme]:
-                    regrouped[theme][sous_theme] = []
-                regrouped[theme][sous_theme].append(file_name)
+                def worker():
+                    self.chat_panel.chat_text.config(state="normal")
+                    self.chat_panel.chat_text.insert(END, "\nAssistant : Modification en cours...\n", ("system",))
+                    self.chat_panel.chat_text.tag_config("system", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
+                    self.chat_panel.chat_text.config(state="disabled")
 
-            self.chat_panel.chat_text.config(state="normal")
-            self.chat_panel.chat_text.insert(END, "\n===== RÉORGANISATION PROPOSÉE =====\n\n")
-            for theme, sous_dict in regrouped.items():
-                self.chat_panel.chat_text.insert(END, f"Thème : {theme}\n", ("theme",))
-                for sous_theme, files_list in sous_dict.items():
-                    if sous_theme and sous_theme != "":
-                        self.chat_panel.chat_text.insert(END, f"  Sous-thème : {sous_theme}\n", ("sous_theme",))
-                        for file_name in files_list:
-                            self.chat_panel.chat_text.insert(END, f"    • {file_name}\n", ("file",))
-                    else:
-                        for file_name in files_list:
-                            self.chat_panel.chat_text.insert(END, f"  • {file_name}\n", ("file",))
-                self.chat_panel.chat_text.insert(END, "\n")
-            self.chat_panel.chat_text.insert(END, "===================================\n")
-            # Styles pour améliorer la lisibilité
-            self.chat_panel.chat_text.tag_config("theme", foreground="#FFD700", font=(get_system_font(), 11, "bold"))
-            self.chat_panel.chat_text.tag_config("sous_theme", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
-            self.chat_panel.chat_text.tag_config("file", foreground="#e0e0e0", font=(get_monospace_font(), 10))
-            # Message de confirmation/modification
-            self.chat_panel.chat_text.insert(END, "\nMerci de confirmer cette organisation ou de préciser une demande de modification (ex : déplacer un fichier, renommer un thème, etc.).\n", ("confirm",))
-            self.chat_panel.chat_text.tag_config("confirm", foreground="#FFD700", font=(get_system_font(), 11, "italic"))
-            self.chat_panel.chat_text.config(state="disabled")
-            self.chat_panel.progress['value'] = 100
-            # Stocke la dernière organisation pour modification/validation
-            self.last_regrouped = regrouped
-            self.last_files = files
+                    # Envoie toute l'organisation actuelle et la demande utilisateur en une seule requête
+                    prompt = self.build_modification_prompt(user_text, self.last_regrouped)
+                    print(f"[DEBUG] Prompt envoyé à l'IA :\n", prompt)
+                    suggestions = None
+                    for attempt in range(5):
+                        response = get_ai_response(prompt)
+                        print(f"[DEBUG] Réponse brute IA tentative {attempt+1} :\n", response)
+                        try:
+                            if isinstance(response, str):
+                                suggestions = json.loads(response.replace("'", '"'))
+                            else:
+                                suggestions = response
+                            print(f"[DEBUG] Réponse IA parsée tentative {attempt+1} :\n", suggestions)
+                            break
+                        except Exception as e:
+                            print(f"[DEBUG] Erreur parsing JSON IA tentative {attempt+1} :", e)
+                            suggestions = None
+                    if suggestions is None:
+                        from tkinter import messagebox
+                        messagebox.showwarning("Erreur IA", "La demande de réorganisation n'a pas pu être traitée après 5 tentatives.")
+                        return
 
-        threading.Thread(target=loading_and_real_organization, daemon=True).start()
-
-
-
-
-        self.gemini_validator = GeminiValidator()
-
-    def show_links_photos_buttons(self):
-        banner = Banner(self.master, self.settings.get('links_photos', []))
-        banner.show()
-
-def get_taskbar_height():
-    """Get taskbar height for Windows, return 0 for other systems."""
-    if platform.system() == "Windows":
-        try:
-            import ctypes
-            user32 = ctypes.windll.user32
-            hWnd = user32.FindWindowW(u'Shell_TrayWnd', None)
-            rect = ctypes.wintypes.RECT()
-            user32.GetWindowRect(hWnd, ctypes.byref(rect))
-            # Check if taskbar is at the bottom
-            screen_width = user32.GetSystemMetrics(0)  # SM_CXSCREEN
-            return rect.bottom - rect.top if rect.left == 0 and rect.right == screen_width else 0
-        except Exception:
-            return 40  # fallback default
-    return 0
-
-def main():
-    root = Tk()
-
-    # Get screen dimensions
-    screen_width = root.winfo_screenwidth()
-    screen_height = root.winfo_screenheight()
-    
-    banner_width = 400
-    current_os = platform.system()
-    
-    if current_os == "Windows":
-        # Windows: Right vertical banner, no title bar
-        taskbar_height = get_taskbar_height()
-        banner_height = screen_height - taskbar_height
-        x = screen_width - banner_width
+                    print("[DEBUG] Regroupement de la nouvelle organisation...")
+                    regrouped = {}
+                    for file_name, info in suggestions.items():
+                        theme = info.get('theme', 'Inconnu') or 'Inconnu'
+                        sous_theme = info.get('sous_theme', '') or ''
+                        if theme not in regrouped:
+                            regrouped[theme] = {}
+                        if sous_theme not in regrouped[theme]:
+                            regrouped[theme][sous_theme] = []
+                        regrouped[theme][sous_theme].append(file_name)
+                    print("[DEBUG] Organisation regroupée :\n", regrouped)
+                    self.last_regrouped = regrouped
+                    self.chat_panel.chat_text.config(state="normal")
+                    self.chat_panel.chat_text.delete(1.0, END)
+                    self.chat_panel.chat_text.insert(END, "\n===== NOUVELLE ORGANISATION PROPOSÉE =====\n\n")
+                    for theme, sous_dict in regrouped.items():
+                        self.chat_panel.chat_text.insert(END, f"Thème : {theme}\n", ("theme",))
+                        for sous_theme, files_list in sous_dict.items():
+                            if sous_theme and sous_theme != "":
+                                self.chat_panel.chat_text.insert(END, f"  Sous-thème : {sous_theme}\n", ("sous_theme",))
+                                for file_name in files_list:
+                                    self.chat_panel.chat_text.insert(END, f"    • {file_name}\n", ("file",))
+                            else:
+                                for file_name in files_list:
+                                    self.chat_panel.chat_text.insert(END, f"  • {file_name}\n", ("file",))
+                        self.chat_panel.chat_text.insert(END, "\n")
+                    self.chat_panel.chat_text.insert(END, "===================================\n")
+                    self.chat_panel.chat_text.insert(END, "\nMerci de confirmer cette organisation ou de préciser une demande de modification (ex : déplacer un fichier, renommer un thème, etc.).\n", ("confirm",))
+                    self.chat_panel.chat_text.tag_config("theme", foreground="#FFD700", font=(get_system_font(), 11, "bold"))
+                    self.chat_panel.chat_text.tag_config("sous_theme", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
+                    self.chat_panel.chat_text.tag_config("file", foreground="#e0e0e0", font=(get_monospace_font(), 10))
+                    self.chat_panel.chat_text.tag_config("confirm", foreground="#FFD700", font=(get_system_font(), 11, "italic"))
+                    self.chat_panel.chat_text.config(state="disabled")
+                    self.chat_panel.progress['value'] = 100
+                threading.Thread(target=worker, daemon=True).start()
         y = 0
         root.geometry(f"{banner_width}x{banner_height}+{x}+{y}")
         
@@ -418,4 +389,35 @@ def main():
     root.mainloop()
 
 if __name__ == "__main__":
-    main()
+    import platform
+    from tkinter import Tk
+    root = Tk()
+    root.withdraw()  # Masque la fenêtre pendant le placement
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    banner_width = 80  # Valeur par défaut, à ajuster selon besoin
+    system = platform.system()
+    if system == "Windows":
+        # Windows : banner vertical à droite, sans barre de titre
+        banner_height = screen_height - 40  # On suppose une taskbar de 40px
+        x = screen_width - banner_width
+        y = 0
+        root.geometry(f"{banner_width}x{banner_height}+{x}+{y}")
+        root.overrideredirect(1)
+        root.lower()
+        root.attributes('-topmost', False)
+    else:
+        # Linux/Mac : banner vertical à droite, sans barre de titre
+        banner_height = screen_height  # Pas de gestion de taskbar
+        x = screen_width - banner_width
+        y = 0
+        root.geometry(f"{banner_width}x{banner_height}+{x}+{y}")
+        root.overrideredirect(1)
+        try:
+            root.lower()
+            root.attributes('-topmost', False)
+        except Exception:
+            pass
+    root.deiconify()  # Affiche la fenêtre après placement
+    app = FileOrganizerApp(root)
+    root.mainloop()
