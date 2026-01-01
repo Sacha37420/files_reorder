@@ -53,7 +53,7 @@ class GeminiValidator:
         with open('src/data/schema.json', 'r', encoding='utf-8') as file:
             return json.load(file)
 
-    def suggest_schema(self, files, batch_size=1, max_files=10):
+    def suggest_schema(self, files, batch_size=1, max_files=10, existing_themes=set(), existing_subthemes=set(), progress_callback=None):
         # files est une liste de dicts avec name, path, date, excerpt
         # On traite par lots pour éviter de dépasser la limite de tokens
         import math
@@ -62,11 +62,10 @@ class GeminiValidator:
         all_results = {}
         n = len(files)
         import re
+        total_batches = max(1, (n + batch_size - 1) // batch_size)
         for batch_num, i in enumerate(range(0, n, batch_size), 1):
             batch = files[i:i+batch_size]
             # Prépare la liste des thèmes/sous-thèmes déjà proposés
-            existing_themes = set()
-            existing_subthemes = set()
             for v in self.previous_suggestions.values():
                 if isinstance(v, dict):
                     theme = v.get('theme', '')
@@ -93,6 +92,10 @@ class GeminiValidator:
             if self.debug:
                 print(f"\n--- Prompt envoyé au batch {batch_num} ---\n{prompt}\n---")
             response = get_ai_response(prompt)
+            # Progression dynamique
+            if progress_callback:
+                percent = 10 + int(70 * batch_num / total_batches)  # 10% au début, 80% à la fin des batchs
+                progress_callback(percent)
             if self.debug:
                 print(f"Réponse brute IA : {response}\n")
             # On suppose que la réponse contient un JSON avec le mapping fichier->{theme, sous_theme}

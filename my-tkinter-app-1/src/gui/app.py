@@ -33,22 +33,36 @@ def get_monospace_font():
         return "Liberation Mono"
 
 class FileOrganizerApp:
+    def request_initial_organization(self):
+        def on_result(regrouped):
+            if regrouped is not None:
+                self.last_regrouped = regrouped
+        self.chat_panel.request_initial_organization(self.last_files, on_result=on_result)
     def __init__(self, master):
         self.master = master
         master.title("File Organizer")
         master.configure(bg="#23272f")
-
         self.settings = self.load_settings()
-        self.chat_panel = ChatPanel(master, self.on_send, open_settings_callback=self.open_settings)
+        from organizer.file_organizer import get_all_files
+        self.last_files = []
+        scan_folders = self.settings.get('scan_folders', [])
+        for folder in scan_folders:
+            self.last_files.extend(get_all_files(folder))
+        print(f"[DEBUG] last_files construit : {len(self.last_files)} fichiers")
+        if self.last_files and isinstance(self.last_files[0], dict):
+            print(f"[DEBUG] Exemple fichier : {self.last_files[0]}")
+        for folder in self.settings.get('scan_folders', []):
+            files = get_all_files(folder)
+            self.last_files.extend(files)
+        self.chat_panel = ChatPanel(master, self.on_send, open_settings_callback=self.open_settings, initial_files=self.last_files)
         self.chat_panel.build()
-
-        # Load settings
-        self.settings = self.load_settings()
-        
-        # Show initial loading and reorganization message
-        self.show_initial_message()
+        # Utilise l'organisation du settings si elle existe
+        self.last_regrouped = self.settings.get('organization', {})
         print(f"App: settings['links_photos'] = {self.settings.get('links_photos', [])}")
-        self.show_links_photos_buttons()
+        # Affiche les boutons liens/photos dans une popup indépendante
+        links_photos = self.settings.get('links_photos', [])
+        if links_photos:
+            self.master.after(500, lambda: Banner(self.master, links_photos).show())
     
     def load_settings(self):
         """Load settings from configuration file."""
@@ -109,315 +123,14 @@ class FileOrganizerApp:
             user_text = self.chat_panel.user_entry.get().strip()
         if not user_text:
             return
-        self.chat_panel.chat_text.config(state="normal")
-        self.chat_panel.chat_text.insert(END, f"\nVous : {user_text}\n", ("user",))
-        self.chat_panel.chat_text.tag_config("user", foreground="#7CFC00", font=(get_system_font(), 10, "bold"))
-        self.chat_panel.chat_text.config(state="disabled")
+        self.chat_panel.add_message(f"\nVous : {user_text}\n", tag="user")
+        self.chat_panel.set_tag("user", foreground="#7CFC00", font=(get_system_font(), 10, "bold"))
         self.chat_panel.user_entry.delete(0, END)
-
-        # Si l'utilisateur confirme (ex: "oui", "ok", "valider", etc.)
-        if user_text.lower() in ["oui", "ok", "valider", "c'est bon", "confirmer", "accepter"]:
-            self.apply_organization()
-        else:
-            # Traiter la demande de modification de l'utilisateur
-            self.modify_organization(user_text)
-
-    def apply_organization(self):
-        """Applique l'organisation actuelle aux fichiers et la sauvegarde dans les settings."""
-        if not hasattr(self, 'last_regrouped'):
-            return
-        self.settings['organization'] = self.last_regrouped
-        self.save_settings()
-        self.chat_panel.chat_text.config(state="normal")
-        self.chat_panel.chat_text.insert(END, "\nAssistant : Organisation en cours...\n", ("system",))
-        self.chat_panel.chat_text.tag_config("system", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
-        self.chat_panel.chat_text.config(state="disabled")
-        # Ici on appellerait la fonction d'organisation réelle
-        # organize_files(self.last_regrouped, self.last_files)
-
-    def modify_organization(self, user_text):
-        """Modifie l'organisation selon la demande de l'utilisateur."""
-        if not hasattr(self, 'last_regrouped'):
-            return
-            
-        import threading
-        import json
-        from api.gemini import get_ai_response
-        
-        def worker():
-            self.chat_panel.chat_text.config(state="normal")
-            self.chat_panel.chat_text.insert(END, "\nAssistant : Modification en cours...\n", ("system",))
-            self.chat_panel.chat_text.tag_config("system", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
-            self.chat_panel.chat_text.config(state="disabled")
-            
-            # Traiter par batch pour éviter les limites de token
-            batch_size = 10
-            all_files = []
-            for theme, sous_dict in self.last_regrouped.items():
-                for sous_theme, files_list in sous_dict.items():
-                    all_files.extend(files_list)
-                    
-            batches = [all_files[i:i+batch_size] for i in range(0, len(all_files), batch_size)]
-            all_suggestions = {}
-            failed_batches = []
-            
-            for idx, batch in enumerate(batches):
-                # Construit un regrouped réduit pour le batch
-                regrouped_batch = {}
-                for theme, sous_dict in self.last_regrouped.items():
-                    for sous_theme, files_list in sous_dict.items():
-                        files_in_batch = [f for f in files_list if f in batch]
-                        if files_in_batch:
-                            if theme not in regrouped_batch:
-                                regrouped_batch[theme] = {}
-                            regrouped_batch[theme][sous_theme] = files_in_batch
-                prompt = self.build_modification_prompt(user_text, regrouped_batch)
-                print(f"[DEBUG] Prompt batch {idx+1} :\n", prompt)
-                suggestions = None
-                for attempt in range(5):
-                    response = get_ai_response(prompt)
-                    print(f"[DEBUG] Réponse brute IA batch {idx+1} tentative {attempt+1} :\n", response)
-                    try:
-                        if isinstance(response, str):
-                            suggestions = json.loads(response.replace("'", '"'))
-                        else:
-                            suggestions = response
-                        print(f"[DEBUG] Réponse IA parsée batch {idx+1} tentative {attempt+1} :\n", suggestions)
-                        break
-                    except Exception as e:
-                        print(f"[DEBUG] Erreur parsing JSON IA batch {idx+1} tentative {attempt+1} :", e)
-                        suggestions = None
-                if suggestions is None:
-                    failed_batches.append(batch)
-                    continue
-                all_suggestions.update(suggestions)
-
-            # Si des lots ont échoué, prévenir l'utilisateur
-            if failed_batches:
-                from tkinter import messagebox
-                failed_files = [f for batch in failed_batches for f in batch]
-                msg = (
-                    "Attention : certains lots n'ont pas pu être traités après 5 tentatives.\n"
-                    "Les fichiers suivants n'ont pas été réorganisés :\n\n"
-                    + "\n".join(failed_files)
-                )
-                messagebox.showwarning("Lots IA échoués", msg)
-            print("[DEBUG] Regroupement de la nouvelle organisation...")
-            regrouped = {}
-            for file_name, info in all_suggestions.items():
-                theme = info.get('theme', 'Inconnu') or 'Inconnu'
-                sous_theme = info.get('sous_theme', '') or ''
-                if theme not in regrouped:
-                    regrouped[theme] = {}
-                if sous_theme not in regrouped[theme]:
-                    regrouped[theme][sous_theme] = []
-                regrouped[theme][sous_theme].append(file_name)
-            print("[DEBUG] Organisation regroupée :\n", regrouped)
-            self.last_regrouped = regrouped
-            self.chat_panel.chat_text.config(state="normal")
-            self.chat_panel.chat_text.delete(1.0, END)
-            self.chat_panel.chat_text.insert(END, "\n===== NOUVELLE ORGANISATION PROPOSÉE =====\n\n")
-            for theme, sous_dict in regrouped.items():
-                self.chat_panel.chat_text.insert(END, f"Thème : {theme}\n", ("theme",))
-                for sous_theme, files_list in sous_dict.items():
-                    if sous_theme and sous_theme != "":
-                        self.chat_panel.chat_text.insert(END, f"  Sous-thème : {sous_theme}\n", ("sous_theme",))
-                        for file_name in files_list:
-                            self.chat_panel.chat_text.insert(END, f"    • {file_name}\n", ("file",))
-                    else:
-                        for file_name in files_list:
-                            self.chat_panel.chat_text.insert(END, f"  • {file_name}\n", ("file",))
-                self.chat_panel.chat_text.insert(END, "\n")
-            self.chat_panel.chat_text.insert(END, "===================================\n")
-            self.chat_panel.chat_text.insert(END, "\nMerci de confirmer cette organisation ou de préciser une demande de modification (ex : déplacer un fichier, renommer un thème, etc.).\n", ("confirm",))
-            self.chat_panel.chat_text.tag_config("theme", foreground="#FFD700", font=(get_system_font(), 11, "bold"))
-            self.chat_panel.chat_text.tag_config("sous_theme", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
-            self.chat_panel.chat_text.tag_config("file", foreground="#e0e0e0", font=(get_monospace_font(), 10))
-            self.chat_panel.chat_text.tag_config("confirm", foreground="#FFD700", font=(get_system_font(), 11, "italic"))
-            self.chat_panel.chat_text.config(state="disabled")
-            self.chat_panel.progress['value'] = 100
-        threading.Thread(target=worker, daemon=True).start()
-
-    def build_modification_prompt(self, user_text, regrouped):
-        prompt = (
-            "Voici l'organisation actuelle de mes fichiers. Tu dois uniquement MODIFIER les thèmes ou sous-thèmes des fichiers concernés par la demande utilisateur.\n"
-            "Pour chaque fichier, indique le thème et le sous-thème (ou une chaîne vide si non pertinent).\n"
-            "ATTENTION :\n"
-            "- Réponds STRICTEMENT au format JSON ci-dessous, sans aucun texte avant ou après, sans tableau d'objets, sans clé supplémentaire.\n"
-            "- Utilise uniquement des guillemets doubles (\") pour le JSON.\n"
-            "- Ne modifie que les thèmes/sous-thèmes des fichiers concernés, laisse les autres inchangés.\n"
-            "- N'invente pas de nouveaux fichiers.\n"
-            "Exemple de réponse attendue :\n"
-            "\"{\\\"fichier1.txt\\\": {\\\"theme\\\": \\\"ThèmeA\\\", \\\"sous_theme\\\": \\\"SousA\\\"}, \\\"fichier2.txt\\\": {\\\"theme\\\": \\\"ThèmeB\\\", \\\"sous_theme\\\": \\\"\\\"}}\"\n"
-            "Voici l'organisation actuelle :\n"
-        )
-        # Ajoute les thèmes/sous-thèmes déjà enregistrés
-        existing_org = self.settings.get('organization')
-        if existing_org:
-            prompt += "\nThèmes et sous-thèmes déjà existants :\n"
-            for theme, sous_dict in existing_org.items():
-                prompt += f"- Thème : {theme}\n"
-                for sous_theme in sous_dict:
-                    if sous_theme:
-                        prompt += f"    Sous-thème : {sous_theme}\n"
-        for theme, sous_dict in regrouped.items():
-            prompt += f"Thème : {theme}\n"
-            for sous_theme, files_list in sous_dict.items():
-                if sous_theme:
-                    prompt += f"  Sous-thème : {sous_theme}\n"
-                for file_name in files_list:
-                    prompt += f"    - {file_name}\n"
-        prompt += ("\nL'utilisateur souhaite la modification suivante :\n" + user_text +
-                   "\nRÉPONDS STRICTEMENT PAR UN DICTIONNAIRE JSON VALIDE mapping chaque nom de fichier vers un objet {\"theme\": ..., \"sous_theme\": ...}. PAS DE TABLEAU, PAS DE TEXTE AUTOUR, PAS DE CLÉ 'fichiers'.")
-        return prompt
-
-
-    def show_initial_message(self):
-        import threading, time, json
-        from organizer.file_organizer import get_default_user_dirs, get_all_files
-        self.chat_panel.chat_text.config(state="normal")
-        self.chat_panel.chat_text.delete(1.0, END)
-        self.chat_panel.chat_text.insert(END, "Assistant : Analyse de la réorganisation en cours")
-        self.chat_panel.chat_text.config(state="disabled")
-
-        def loading_and_real_organization():
-            for i in range(3):
-                self.chat_panel.chat_text.config(state="normal")
-                self.chat_panel.chat_text.insert(END, ".")
-                self.chat_panel.chat_text.see(END)
-                self.chat_panel.chat_text.config(state="disabled")
-                time.sleep(0.5)
-            # Get real organization suggestion
-            self.chat_panel.progress['value'] = 30
-            
-            # Use configured folders or default ones if none configured
-            dirs = self.settings.get('scan_folders', [])
-            if not dirs:
-                from organizer.file_organizer import get_default_user_dirs
-                dirs = get_default_user_dirs()
-                # Update settings with default directories for next time
-                def worker():
-                    self.chat_panel.chat_text.config(state="normal")
-                    self.chat_panel.chat_text.insert(END, "\nAssistant : Modification en cours...\n", ("system",))
-                    self.chat_panel.chat_text.tag_config("system", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
-                    self.chat_panel.chat_text.config(state="disabled")
-
-                    # Envoie toute l'organisation actuelle et la demande utilisateur en une seule requête
-                    prompt = self.build_modification_prompt(user_text, self.last_regrouped)
-                    print(f"[DEBUG] Prompt envoyé à l'IA :\n", prompt)
-                    suggestions = None
-                    for attempt in range(5):
-                        response = get_ai_response(prompt)
-                        print(f"[DEBUG] Réponse brute IA tentative {attempt+1} :\n", response)
-                        try:
-                            if isinstance(response, str):
-                                suggestions = json.loads(response.replace("'", '"'))
-                            else:
-                                suggestions = response
-                            print(f"[DEBUG] Réponse IA parsée tentative {attempt+1} :\n", suggestions)
-                            break
-                        except Exception as e:
-                            print(f"[DEBUG] Erreur parsing JSON IA tentative {attempt+1} :", e)
-                            suggestions = None
-                    if suggestions is None:
-                        from tkinter import messagebox
-                        messagebox.showwarning("Erreur IA", "La demande de réorganisation n'a pas pu être traitée après 5 tentatives.")
-                        return
-
-                    print("[DEBUG] Regroupement de la nouvelle organisation...")
-                    regrouped = {}
-                    for file_name, info in suggestions.items():
-                        theme = info.get('theme', 'Inconnu') or 'Inconnu'
-                        sous_theme = info.get('sous_theme', '') or ''
-                        if theme not in regrouped:
-                            regrouped[theme] = {}
-                        if sous_theme not in regrouped[theme]:
-                            regrouped[theme][sous_theme] = []
-                        regrouped[theme][sous_theme].append(file_name)
-                    print("[DEBUG] Organisation regroupée :\n", regrouped)
-                    self.last_regrouped = regrouped
-                    self.chat_panel.chat_text.config(state="normal")
-                    self.chat_panel.chat_text.delete(1.0, END)
-                    self.chat_panel.chat_text.insert(END, "\n===== NOUVELLE ORGANISATION PROPOSÉE =====\n\n")
-                    for theme, sous_dict in regrouped.items():
-                        self.chat_panel.chat_text.insert(END, f"Thème : {theme}\n", ("theme",))
-                        for sous_theme, files_list in sous_dict.items():
-                            if sous_theme and sous_theme != "":
-                                self.chat_panel.chat_text.insert(END, f"  Sous-thème : {sous_theme}\n", ("sous_theme",))
-                                for file_name in files_list:
-                                    self.chat_panel.chat_text.insert(END, f"    • {file_name}\n", ("file",))
-                            else:
-                                for file_name in files_list:
-                                    self.chat_panel.chat_text.insert(END, f"  • {file_name}\n", ("file",))
-                        self.chat_panel.chat_text.insert(END, "\n")
-                    self.chat_panel.chat_text.insert(END, "===================================\n")
-                    self.chat_panel.chat_text.insert(END, "\nMerci de confirmer cette organisation ou de préciser une demande de modification (ex : déplacer un fichier, renommer un thème, etc.).\n", ("confirm",))
-                    self.chat_panel.chat_text.tag_config("theme", foreground="#FFD700", font=(get_system_font(), 11, "bold"))
-                    self.chat_panel.chat_text.tag_config("sous_theme", foreground="#87CEEB", font=(get_system_font(), 10, "italic"))
-                    self.chat_panel.chat_text.tag_config("file", foreground="#e0e0e0", font=(get_monospace_font(), 10))
-                    self.chat_panel.chat_text.tag_config("confirm", foreground="#FFD700", font=(get_system_font(), 11, "italic"))
-                    self.chat_panel.chat_text.config(state="disabled")
-                    self.chat_panel.progress['value'] = 100
-                threading.Thread(target=worker, daemon=True).start()
-        y = 0
-        root.geometry(f"{banner_width}x{banner_height}+{x}+{y}")
-        
-        # Remove window frame (no title bar, no border)
-        root.overrideredirect(1)
-        
-        # Lower the window below all others
-        root.lower()
-        root.attributes('-topmost', False)
-    else:
-        # Linux/Mac: Same as Windows - right vertical banner, no title bar
-        banner_height = screen_height  # No taskbar consideration on Linux
-        x = screen_width - banner_width
-        y = 0
-        root.geometry(f"{banner_width}x{banner_height}+{x}+{y}")
-        
-        # Remove window frame (no title bar, no border)
-        root.overrideredirect(1)
-        
-        # Lower the window below all others (may not work on all Linux window managers)
-        try:
-            root.lower()
-            root.attributes('-topmost', False)
-        except Exception:
-            pass  # Some Linux window managers may not support these attributes
-
-    app = FileOrganizerApp(root)
-    root.mainloop()
+        # La logique d'organisation est maintenant gérée dans ChatPanel
+        print(f"[DEBUG] Transmission à ChatPanel : {len(self.last_files)} fichiers")
+        self.chat_panel.handle_user_input(user_text)
 
 if __name__ == "__main__":
-    import platform
-    from tkinter import Tk
     root = Tk()
-    root.withdraw()  # Masque la fenêtre pendant le placement
-    screen_width = root.winfo_screenwidth()
-    screen_height = root.winfo_screenheight()
-    banner_width = 80  # Valeur par défaut, à ajuster selon besoin
-    system = platform.system()
-    if system == "Windows":
-        # Windows : banner vertical à droite, sans barre de titre
-        banner_height = screen_height - 40  # On suppose une taskbar de 40px
-        x = screen_width - banner_width
-        y = 0
-        root.geometry(f"{banner_width}x{banner_height}+{x}+{y}")
-        root.overrideredirect(1)
-        root.lower()
-        root.attributes('-topmost', False)
-    else:
-        # Linux/Mac : banner vertical à droite, sans barre de titre
-        banner_height = screen_height  # Pas de gestion de taskbar
-        x = screen_width - banner_width
-        y = 0
-        root.geometry(f"{banner_width}x{banner_height}+{x}+{y}")
-        root.overrideredirect(1)
-        try:
-            root.lower()
-            root.attributes('-topmost', False)
-        except Exception:
-            pass
-    root.deiconify()  # Affiche la fenêtre après placement
     app = FileOrganizerApp(root)
     root.mainloop()
