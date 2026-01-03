@@ -28,38 +28,38 @@ class Banner:
         links = self.links_photos
         print(f"Banner: links_photos count = {len(links)}")
         if not links:
-            print("Banner: No links/photos to show.")
             return
-        btn_size = 35
-        btn_pad = 15
-        n = len(links)
-        print(f"Banner: n = {n}")
-        total_btn_w = n * btn_size + (n-1) * btn_pad
-        w = max(320, total_btn_w + 20)
-        h = btn_size + 10
-        w = max(320, total_btn_w + 20)
-        screen_width = self.master.winfo_screenwidth()
-        x = int((screen_width - w) / 2)
-        y = 0
+
+        # Determine screen dimensions
+        screen_w = self.master.winfo_screenwidth()
+        w, h = 300, 100
+        x = (screen_w - w) // 2
+        y = 0  # Position the banner at the very top of the screen
+
+        # Create popup window
+        popup = Toplevel(self.master)
+        popup.overrideredirect(1)
+        popup.geometry(f"{w}x{h}+{x}+{y}")
+
         import platform
-        system = platform.system()
-        if system == "Windows":
-            magenta_hex = '#FF00FF'
-            popup = Toplevel(self.master)
-            popup.overrideredirect(1)
-            popup.geometry(f"{w}x{h}+{x}+{y}")
+        if platform.system() == "Windows":
+            magenta_hex = "#FF00FF"
             popup.configure(bg=magenta_hex)
             try:
                 popup.attributes('-transparentcolor', magenta_hex)
-            except Exception:
-                pass
-        else:
-            popup = Toplevel(self.master)
-            popup.overrideredirect(1)
-            popup.geometry(f"{w}x{h}+{x}+{y}")
-            popup.configure(bg='')
+                print("[DEBUG] Transparency enabled on Windows.")
+            except Exception as e:
+                print(f"[WARNING] Transparency not supported: {e}")
+        else:  # Linux or other systems
+            popup.configure(bg="")
+            popup.attributes('-alpha', 0.9)  # Semi-transparent background
+            print("[DEBUG] Transparency not supported, using semi-transparent background.")
+
         popup.attributes('-topmost', True)
-        start_x = (w - total_btn_w) // 2
+        popup.attributes('-disabled', True)  # Prevent popup from intercepting clicks
+
+        # Add buttons or icons
+        start_x = (w - len(links) * 50) // 2
         btn_y = 5
         for idx, item in enumerate(links):
             url = item.get('url', '').strip()
@@ -88,23 +88,23 @@ class Banner:
             try:
                 if img is None:
                     continue
-                if system == "Windows":
-                    img = self.make_rounded_transparent(img, btn_size)
+                if platform.system() == "Windows":
+                    img = self.make_rounded_transparent(img, 35)
                     img_tk = ImageTk.PhotoImage(img)
                     self._link_images.append(img_tk)
                     from tkinter import Label
                     lbl = Label(popup, image=img_tk, bg=magenta_hex, borderwidth=0, highlightthickness=0)
                 else:
-                    img = img.convert('RGBA').resize((btn_size, btn_size))
-                    mask = Image.new('L', (btn_size, btn_size), 0)
+                    img = img.convert('RGBA').resize((35, 35))
+                    mask = Image.new('L', (35, 35), 0)
                     draw = ImageDraw.Draw(mask)
-                    draw.ellipse((0, 0, btn_size, btn_size), fill=255)
+                    draw.ellipse((0, 0, 35, 35), fill=255)
                     img.putalpha(mask)
                     img_tk = ImageTk.PhotoImage(img)
                     self._link_images.append(img_tk)
                     from tkinter import Label
                     lbl = Label(popup, image=img_tk, bg='white', borderwidth=0, highlightthickness=0)
-                lbl.place(x=start_x + idx * (btn_size + btn_pad), y=btn_y, width=btn_size, height=btn_size)
+                lbl.place(x=start_x + idx * (35 + 15), y=btn_y, width=35, height=35)
                 lbl.bind('<Button-1>', lambda e, u=url: webbrowser.open(u))
                 print(f"Banner: Image placed on label idx={idx}")
             except Exception as e:

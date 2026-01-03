@@ -1,4 +1,7 @@
-tkinter
 requests
 jsonschema
 python-dotenv
+openpyxl
+Pillow
+beautifulsoup4
+python-docx

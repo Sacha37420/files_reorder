@@ -5,12 +5,19 @@ import os
 import sys
 import pathlib
 import platform
+import subprocess
+import traceback
+
 sys.path.append(str(pathlib.Path(__file__).resolve().parent.parent))
 from organizer.file_organizer import organize_files
 from ai.gemini_validator import GeminiValidator
 from banner import Banner
 from settings_window import SettingsWindow
 from chat_panel import ChatPanel
+
+# Ensure dependencies are installed
+install_script = os.path.join(os.path.dirname(__file__), '..', 'install', 'install_dependencies.py')
+subprocess.check_call([sys.executable, install_script])
 
 def get_system_font():
     """Get appropriate font family for the current system."""
@@ -39,30 +46,63 @@ class FileOrganizerApp:
                 self.last_regrouped = regrouped
         self.chat_panel.request_initial_organization(self.last_files, on_result=on_result)
     def __init__(self, master):
+        print("[DEBUG] Initializing FileOrganizerApp...")
         self.master = master
         master.title("File Organizer")
+        print("[DEBUG] Window title set.")
         master.configure(bg="#23272f")
+        print("[DEBUG] Window background configured.")
         self.settings = self.load_settings()
+        print("[DEBUG] Settings loaded.")
+
+        # Initialize ChatPanel early
+        print("[DEBUG] Initializing ChatPanel...")
+        self.chat_panel = ChatPanel(master, self.on_send, open_settings_callback=self.open_settings, initial_files=[])
+        print("[DEBUG] ChatPanel initialized.")
+        print("[DEBUG] Building ChatPanel...")
+        self.chat_panel.build()
+        print("[DEBUG] ChatPanel built.")
+
+        # Display the window before scanning folders
+        self.master.update()
+
+        # Display banner early and force UI update
+        links_photos = self.settings.get('links_photos', [])
+        if links_photos:
+            print("[DEBUG] Links/photos found, displaying banner.")
+            Banner(self.master, links_photos).show()
+            self.master.update()  # Force immediate UI update
+
         from organizer.file_organizer import get_all_files
         self.last_files = []
         scan_folders = self.settings.get('scan_folders', [])
-        for folder in scan_folders:
-            self.last_files.extend(get_all_files(folder))
-        print(f"[DEBUG] last_files construit : {len(self.last_files)} fichiers")
+        print(f"[DEBUG] Scan folders: {scan_folders}")
+
+        # Use the existing progress bar in ChatPanel
+        if hasattr(self.chat_panel, 'progress'):
+            self.chat_panel.progress['maximum'] = len(scan_folders)
+        else:
+            print("[ERROR] ChatPanel does not have a progress bar.")
+
+        for i, folder in enumerate(scan_folders):
+            try:
+                print(f"[DEBUG] Scanning folder: {folder}")
+                files = get_all_files(folder)
+                print(f"[DEBUG] Found {len(files)} files in {folder}")
+                self.last_files.extend(files)
+            except Exception as e:
+                print(f"[ERROR] Failed to scan folder {folder}: {e}")
+            finally:
+                if hasattr(self.chat_panel, 'progress'):
+                    self.chat_panel.set_progress(i + 1)
+                self.master.update_idletasks()
+
+        print(f"[DEBUG] Total files scanned: {len(self.last_files)}")
         if self.last_files and isinstance(self.last_files[0], dict):
-            print(f"[DEBUG] Exemple fichier : {self.last_files[0]}")
-        for folder in self.settings.get('scan_folders', []):
-            files = get_all_files(folder)
-            self.last_files.extend(files)
-        self.chat_panel = ChatPanel(master, self.on_send, open_settings_callback=self.open_settings, initial_files=self.last_files)
-        self.chat_panel.build()
-        # Utilise l'organisation du settings si elle existe
+            print(f"[DEBUG] Example file: {self.last_files[0]}")
+
         self.last_regrouped = self.settings.get('organization', {})
-        print(f"App: settings['links_photos'] = {self.settings.get('links_photos', [])}")
-        # Affiche les boutons liens/photos dans une popup indépendante
-        links_photos = self.settings.get('links_photos', [])
-        if links_photos:
-            self.master.after(500, lambda: Banner(self.master, links_photos).show())
+        print(f"[DEBUG] Last regrouped settings: {self.last_regrouped}")
     
     def load_settings(self):
         """Load settings from configuration file."""
@@ -131,6 +171,14 @@ class FileOrganizerApp:
         self.chat_panel.handle_user_input(user_text)
 
 if __name__ == "__main__":
-    root = Tk()
-    app = FileOrganizerApp(root)
-    root.mainloop()
+    try:
+        print("[DEBUG] Starting the application...")
+        root = Tk()
+        print("[DEBUG] Tkinter root window initialized.")
+        app = FileOrganizerApp(root)
+        print("[DEBUG] FileOrganizerApp initialized.")
+        root.mainloop()
+        print("[DEBUG] Application main loop started.")
+    except Exception as e:
+        print(f"[ERROR] An unexpected error occurred: {e}")
+        traceback.print_exc()
