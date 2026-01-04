@@ -31,13 +31,13 @@ class SettingsWindow:
         self.settings_window = Toplevel(self.master)
         self.settings_window.title("Paramètres")
         self.settings_window.configure(bg="#23272f")
-        self.settings_window.geometry("540x600")
+        self.settings_window.geometry("600x800")
         self.settings_window.resizable(True, False)
         self.settings_window.transient(self.master)
         self.settings_window.grab_set()
         x = self.master.winfo_x() - 520
         y = self.master.winfo_y()
-        self.settings_window.geometry(f"540x600+{x}+{y}")
+        self.settings_window.geometry(f"600x800+{x}+{y}")
         nas_label = Label(self.settings_window, text="URL du NAS:", font=(get_system_font(), 12, "bold"), fg="#fff", bg="#23272f")
         nas_label.pack(pady=(20, 5), anchor="w", padx=20)
         self.nas_entry = Entry(self.settings_window, font=(get_system_font(), 11), bg="#181a20", fg="#e0e0e0", insertbackground="#fff", relief="flat", width=60)
@@ -83,6 +83,24 @@ class SettingsWindow:
         cancel_button.pack(side="right", padx=(10, 0))
         save_button = Button(action_frame, text="Sauvegarder", font=(get_system_font(), 10, "bold"), bg="#FFD700", fg="#23272f", relief="flat", command=self.save_settings_and_close)
         save_button.pack(side="right")
+
+        # Gemini API Key Section
+        gemini_key_label = Label(self.settings_window, text="Clé API Gemini:", font=(get_system_font(), 12, "bold"), fg="#fff", bg="#23272f")
+        gemini_key_label.pack(pady=(10, 5), anchor="w", padx=20)
+        self.gemini_key_entry = Entry(self.settings_window, font=(get_system_font(), 11), bg="#181a20", fg="#e0e0e0", insertbackground="#fff", relief="flat", width=60)
+        self.gemini_key_entry.pack(pady=(0, 5), padx=20, fill="x")
+        self.gemini_key_entry.insert(0, self.settings.get('GEMINI_API_KEY', ''))
+        gemini_key_button = Button(self.settings_window, text="Générer une clé Gemini", font=(get_system_font(), 10), bg="#007bff", fg="#fff", relief="flat", command=self.open_gemini_key_page)
+        gemini_key_button.pack(pady=(0, 15), padx=20, anchor="w")
+
+        # Mistral API Key Section
+        api_key_label = Label(self.settings_window, text="Clé API Mistral:", font=(get_system_font(), 12, "bold"), fg="#fff", bg="#23272f")
+        api_key_label.pack(pady=(10, 5), anchor="w", padx=20)
+        self.api_key_entry = Entry(self.settings_window, font=(get_system_font(), 11), bg="#181a20", fg="#e0e0e0", insertbackground="#fff", relief="flat", width=60)
+        self.api_key_entry.pack(pady=(0, 5), padx=20, fill="x")
+        self.api_key_entry.insert(0, self.settings.get('MISTRAL_API_KEY', ''))
+        mistral_key_button = Button(self.settings_window, text="Générer une clé Mistral", font=(get_system_font(), 10), bg="#007bff", fg="#fff", relief="flat", command=self.open_mistral_key_page)
+        mistral_key_button.pack(pady=(0, 15), padx=20, anchor="w")
 
     def add_folder(self):
         folder = filedialog.askdirectory(title="Sélectionner un dossier à scanner")
@@ -158,5 +176,21 @@ class SettingsWindow:
         self.settings['nas_url'] = self.nas_entry.get().strip()
         self.settings['scan_folders'] = self.get_current_folders_list()
         self.settings['links_photos'] = self.get_links_photos_list()
+        self.settings['GEMINI_API_KEY'] = self.gemini_key_entry.get().strip()
+        self.settings['MISTRAL_API_KEY'] = self.api_key_entry.get().strip()
+
+        # Write API keys to .env file
+        with open('.env', 'w') as env_file:
+            env_file.write(f"GEMINI_API_KEY={self.settings['GEMINI_API_KEY']}\n")
+            env_file.write(f"MISTRAL_API_KEY={self.settings['MISTRAL_API_KEY']}\n")
+
         self.save_callback(self.settings)
         self.settings_window.destroy()
+
+    def open_gemini_key_page(self):
+        import os
+        os.system("start https://ai.google.dev")
+
+    def open_mistral_key_page(self):
+        import os
+        os.system("start https://console.mistral.ai")

@@ -9,6 +9,7 @@ class GeminiValidator:
         """
         from api.gemini import get_ai_response
 
+        print("[DEBUG] Appel à propose_global_organization")
         prompt = (
             "Voici la liste des fichiers, leur thème principal et leur sous-thème proposé :\n"
         )
@@ -91,46 +92,50 @@ class GeminiValidator:
                 prompt += f"Nom : {f['name']} | Chemin : {f['path']} | Date : {f['date']} | Extrait : {f['excerpt'][:50]}\n"
             if self.debug:
                 print(f"\n--- Prompt envoyé au batch {batch_num} ---\n{prompt}\n---")
-            response = get_ai_response(prompt)
-            # Progression dynamique
+            print(f"[DEBUG] Envoi du lot {batch_num}/{total_batches} à l'IA avec {len(batch)} fichiers.")
+            print(f"[DEBUG] Prompt envoyé : {prompt}")
+            try:
+                response = get_ai_response(prompt)
+            except Exception as e:
+                print(f"[ERREUR] Échec de l'appel à l'IA pour le batch {batch_num} : {e}")
+                continue
+
             if progress_callback:
-                percent = 10 + int(70 * batch_num / total_batches)  # 10% au début, 80% à la fin des batchs
+                percent = 10 + int(70 * batch_num / total_batches)  # Progression dynamique
                 progress_callback(percent)
+
             if self.debug:
-                print(f"Réponse brute IA : {response}\n")
-            # On suppose que la réponse contient un JSON avec le mapping fichier->{theme, sous_theme}
+                print(f"Réponse brute IA pour le batch {batch_num} : {response}\n")
+
             batch_suggestions = {}
             if isinstance(response, dict):
                 batch_suggestions = response
             elif isinstance(response, str):
                 # Nettoyage de la réponse pour extraire le bloc JSON
                 json_str = None
-                # Cherche un bloc ```json ... ``` ou ``` ... ```
-                match = re.search(r"```json(.*?)```", response, re.DOTALL)
-                if not match:
-                    match = re.search(r"```(.*?)```", response, re.DOTALL)
-                if match:
-                    json_str = match.group(1)
-                else:
-                    # Sinon, cherche le premier bloc {...}
-                    match = re.search(r"\{[\s\S]*\}", response)
+                try:
+                    match = re.search(r"```json(.*?)```", response, re.DOTALL)
+                    if not match:
+                        match = re.search(r"```(.*?)```", response, re.DOTALL)
                     if match:
-                        json_str = match.group(0)
-                if json_str:
-                    try:
-                        # Remplace les quotes simples par des doubles si besoin (pour compatibilité JSON)
+                        json_str = match.group(1)
+                    else:
+                        match = re.search(r"\{[\s\S]*\}", response)
+                        if match:
+                            json_str = match.group(0)
+                    if json_str:
                         json_str_clean = json_str.replace("'", '"')
                         batch_suggestions = json.loads(json_str_clean)
-                    except Exception as e:
-                        if self.debug:
-                            print(f"Erreur parsing JSON extrait : {e}\n")
-                else:
-                    if self.debug:
-                        print("Aucun bloc JSON trouvé dans la réponse IA.\n")
-            # Ajoute les suggestions du batch à l'historique et au résultat global
+                    else:
+                        print(f"[DEBUG] Aucun bloc JSON valide trouvé dans la réponse pour le batch {batch_num}.")
+                except Exception as e:
+                    print(f"[ERREUR] Échec du parsing JSON pour le batch {batch_num} : {e}")
+
             if batch_suggestions:
                 self.previous_suggestions.update(batch_suggestions)
                 all_results.update(batch_suggestions)
+            else:
+                print(f"[DEBUG] Aucune suggestion valide pour le batch {batch_num}.")
         return all_results
 
     def send_feedback(self, feedback):

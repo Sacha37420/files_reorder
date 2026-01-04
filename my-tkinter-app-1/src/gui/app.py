@@ -103,6 +103,9 @@ class FileOrganizerApp:
 
         self.last_regrouped = self.settings.get('organization', {})
         print(f"[DEBUG] Last regrouped settings: {self.last_regrouped}")
+        print("[DEBUG] Appel à request_initial_organization après le scan des fichiers.")
+        # Appel explicite à l'organisation initiale après le scan des fichiers
+        self.request_initial_organization()
     
     def load_settings(self):
         """Load settings from configuration file."""
@@ -169,6 +172,7 @@ class FileOrganizerApp:
         # La logique d'organisation est maintenant gérée dans ChatPanel
         print(f"[DEBUG] Transmission à ChatPanel : {len(self.last_files)} fichiers")
         self.chat_panel.handle_user_input(user_text)
+        print(f"[DEBUG] Contenu de self.last_files avant organisation initiale : {len(self.last_files)} fichiers")
 
 if __name__ == "__main__":
     try:

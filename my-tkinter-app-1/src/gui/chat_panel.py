@@ -57,6 +57,7 @@ class ChatPanel:
                 print(f"[DEBUG] Prompt batch {idx+1} :\n", prompt)
                 suggestions = None
                 for attempt in range(5):
+                    print("[DEBUG] Appel à modify_organization avec le batch")
                     response = get_ai_response(prompt)
                     print(f"[DEBUG] Réponse brute IA batch {idx+1} tentative {attempt+1} :\n", response)
                     try:
@@ -293,6 +294,7 @@ class ChatPanel:
 
         # Récupère et affiche l'organisation initiale via l'IA (après création des widgets)
         if self.initial_files:
+            print(f"[DEBUG] Contenu de self.initial_files avant organisation initiale : {len(self.initial_files)} fichiers")
             self.frame.after(0, lambda: self.request_initial_organization(self.initial_files))
 
     def on_send(self):
